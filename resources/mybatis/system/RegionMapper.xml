@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegionMapper">
+	<resultMap type="Region" id="regionResultMap">
+		<id property="regionId" column="region_id"/>
+		<result property="regionCode" column="region_code"/>
+		<result property="regionName" column="region_name"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="regionLevel" column="region_level"/>
+		<result property="regionOrder" column="region_order"/>
+		<result property="regionNameEn" column="region_name_en"/>
+		<result property="regionShortNameEn" column="region_shortname_en"/>
+	</resultMap>
+	<!-- 根据父ID查询下级 -->
+	<select id="queryRegionByParentId" parameterType="pd" resultMap="regionResultMap">
+		select 
+			region_id,
+			region_code,
+			region_name,
+			parent_id,
+			region_level,
+			region_order,
+			region_name_en,
+			region_shortname_en
+		from region
+		where parent_id = #{regionParentId}
+	</select>
+</mapper>

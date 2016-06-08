@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="BankRecoMapper">
+	
+   		<resultMap type="BankReco" id="BankRecotheResultMap">
+       		<id property="id" column="id"/>
+	       	<result property="systrace" column="sys_trace"/>
+	       	<result property="acpName" column="acp_name"/>
+	       	<result property="mid" column="mid"/>
+	       	<result property="pan" column="pan"/>
+	       	<result property="tid" column="tid"/>
+	       	<result property="txnAmt" column="txn_amt"/>
+	       	<result property="tranDate" column="trandate"/>
+	       	<result property="txnName" column="txn_name"/>
+	       
+   		</resultMap>
+	   
+	   	<!-- 查询交易信息列表 -->
+   		<select id="findBankRecoBySystrace" parameterType="String" resultMap="BankRecotheResultMap">
+      		select 
+	      			*
+         	from 
+         			bank_reconciliation
+          	where
+          	     	sys_trace = #{sysTrace}
+   		</select>
+	</mapper>

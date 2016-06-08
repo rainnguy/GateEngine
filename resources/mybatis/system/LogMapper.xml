@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LogMapper">
+	<!-- ORM对应关系 -->
+	<resultMap type="Log" id="logResultMap">
+		<id property="id" column="id"/>
+		<result property="name"          column="name"/>
+		<result property="systemType"    column="system_type"/>
+		<result property="operatorType"  column="operator_type"/>
+		<result property="menuName"      column="menu_name"/>
+		<result property="remark"        column="remark"/>
+		<result property="createDate"    column="create_date"/>
+		<result property="createUserId"  column="create_user_id"/>
+	</resultMap>
+	
+	<!-- 根据条件分页查询日志 -->
+	<select id="logslistPage" parameterType="pd" resultMap="logResultMap">
+		SELECT 
+				sl.id                                                 AS  id,
+				SU.NAME                                               AS  name,
+				d1.name                                               AS  system_type,
+				d2.name                                               AS operator_type,
+				sm.menu_name                                          AS menu_name,
+				sl.remark                                             AS remark,
+				DATE_FORMAT(sl.create_date,'%Y-%m-%d %H:%m:%s')       AS create_date,
+				sl.create_user_id                                     AS create_user_id
+		FROM
+				sys_log sl
+			LEFT JOIN SYS_USER su ON sl.user_name = su.USERNAME
+			LEFT JOIN sys_menu sm ON sl.menu_id=sm.menu_id
+			LEFT JOIN dictionary d1 ON sl.system_type=d1.value and d1.type='systemType'
+			LEFT JOIN dictionary d2 ON sl.operator_type=d2.value and d2.type in ('operatorTypeD','operatorTypeL')
+			JOIN (SELECT getChildCompanyIdList(#{pd.currUdepId}) AS idList) L
+		WHERE
+				1=1
+				AND FIND_IN_SET(su.department_id,L.idList)
+		<if test="pd.keyWord != null and pd.keyWord != ''"><!-- 关键词检索 -->
+			AND
+				(
+					 SU.NAME LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 sm.menu_name LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%') 
+					 OR
+					 sl.remark LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+				)
+		</if>
+		<if test="pd.systemType != null and pd.systemType != '' ">
+			AND sl.system_type = #{pd.systemType}
+		</if>
+		<if test="pd.operatorType != null and pd.operatorType != '' ">
+			AND sl.operator_type = #{pd.operatorType}
+		</if>
+		<if test="pd.logStart != null and pd.logStart != '' "><!-- 日志记录时间检索 -->
+			AND sl.create_date &gt;= #{pd.logStart} 
+		</if>
+		<if test="pd.logEnd!=null and pd.logEnd!=''"><!-- 日志记录时间检索 -->
+			AND sl.create_date &lt; DATE_ADD(#{pd.logEnd},INTERVAL 1 DAY) 
+		</if>
+		ORDER BY
+				sl.create_date DESC
+	</select>
+	
+	<!-- 插入一条新的日志 -->
+	<insert id="insertOneLog" parameterType="map">
+		INSERT INTO sys_log(
+							user_name,
+							system_type,
+							operator_type,
+							menu_id,
+							remark,
+							create_date,
+							create_user_id
+							)
+					 SELECT 
+							#{userName},						   
+							#{systemType},
+							#{operatorType},
+							menu_id,
+							#{remark},
+							now(),
+							#{userId}
+					FROM
+							sys_menu 
+					WHERE
+							menu_url=#{menuUrl};
+	</insert>
+
+</mapper>

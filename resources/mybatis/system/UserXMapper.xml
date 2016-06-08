@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserXMapper">
+	
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>  
+	
+	<!-- 换皮肤-->
+	<update id="setSKIN" parameterType="pd" flushCache="false">
+		update SYS_USER set 
+		SKIN = #{SKIN} 
+		where USERNAME = #{USERNAME}
+	</update>
+	
+	<!-- 更新登录时间 -->
+	<update id="updateLastLogin" parameterType="pd" flushCache="false">
+		update SYS_USER set 
+		LAST_LOGIN = #{LAST_LOGIN} 
+		where USER_ID = #{USER_ID}
+	</update>
+	
+	<!-- 判断用户名和密码 -->
+	<select id="getUserInfo" parameterType="pd" resultType="pd" useCache="false"><!-- insert update delete (flushCache="true/false") -->
+		select u.*,d.department_type,d.parent_id from SYS_USER u
+		left join sys_department d on u.department_id = d.id
+		where 1=1
+		<if test="USERNAME != null and PASSWORD != null">
+	  	and	(
+	  		(u.USERNAME = #{USERNAME} and u.PASSWORD = #{PASSWORD})
+	  		or
+	  		(u.EMAIL = #{USERNAME} and u.PASSWORD = #{PASSWORD})
+	  		or
+	  		(u.NUMBER = #{USERNAME} and u.PASSWORD = #{PASSWORD})
+	  		)
+		</if>
+		<if test="USER_ID != null and USER_ID != ''">
+		and u.USER_ID = #{USER_ID}
+		</if>
+	</select>
+	
+
+	
+	<!-- 存入IP -->
+	<update id="saveIP" parameterType="pd" flushCache="false">
+		update SYS_USER 
+			set 
+				IP = #{IP}
+			where 
+				USERNAME = #{USERNAME}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="editU" parameterType="pd" flushCache="false">
+		UPDATE  
+				SYS_USER
+		SET
+				USERNAME				= #{USERNAME},
+				NAME 					= #{NAME},
+				ROLE_ID 				= #{ROLE_ID},
+				BZ						= #{BZ},
+				EMAIL					= #{EMAIL},
+				NUMBER					= #{NUMBER},
+				PHONE					= #{PHONE},
+			<if test="PASSWORD != null and PASSWORD != ''">
+				PASSWORD				= #{PASSWORD},
+			</if>
+				department_id           = #{departmentId}
+		WHERE 
+				USER_ID = #{user_id}
+	</update>
+	
+	<!-- 通过user_id获取数据 -->
+	<select id="findByUiId" parameterType="pd" resultType="pd" useCache="false">
+		SELECT 
+				u.user_id,
+				u.USERNAME,
+				u.PASSWORD,
+				u.NAME,
+				u.RIGHTS,
+				u.role_id,
+				r.name            AS role_name,
+				u.LAST_LOGIN,
+				u.IP,
+				u.STATUS,
+				u.BZ,
+				u.SKIN,
+				u.EMAIL,
+				u.NUMBER,
+				U.PHONE,
+				d.id              AS departmentId,
+				d.department_name AS departmentName
+		FROM 
+				SYS_USER u
+			LEFT JOIN SYS_ROLE r on u.ROLE_ID = r.id
+			LEFT JOIN  sys_department d ON u.department_id = d.id 	
+		WHERE 
+				USER_ID = #{user_id}
+	</select>
+	
+	<!-- 根据用户的编号和机构id查找用户 检查编号使用 -->
+	<select id="findByUNoCom" parameterType="pd" resultType="pd" useCache="false">
+		SELECT 
+				user_id,
+				USERNAME,
+				PASSWORD,
+				NAME,
+				RIGHTS,
+				role_id,
+				LAST_LOGIN,
+				IP,
+				STATUS,
+				BZ,
+				SKIN,
+				EMAIL,
+				NUMBER,
+				PHONE
+		FROM 
+				SYS_USER
+		WHERE 
+				department_id = #{departmentId} 
+			and NUMBER = #{NUMBER}
+	</select>
+		
+	<!-- 通过邮箱获取数据 -->
+	<select id="findByUE" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			USER_ID,
+			USERNAME,
+			PASSWORD,
+			NAME,
+			RIGHTS,
+			ROLE_ID,
+			LAST_LOGIN,
+			IP,
+			STATUS,
+			BZ,
+			SKIN,
+			EMAIL,
+			NUMBER,
+			PHONE
+		from 
+			SYS_USER
+		where 
+			EMAIL = #{EMAIL}
+		<if test="USERNAME != null and USERNAME != ''">
+			and USERNAME != #{USERNAME} 
+		</if>
+	</select>
+	
+	<!-- 通过编号获取数据 -->
+	<select id="findByUN" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			USER_ID,
+			USERNAME,
+			PASSWORD,
+			NAME,
+			RIGHTS,
+			ROLE_ID,
+			LAST_LOGIN,
+			IP,
+			STATUS,
+			BZ,
+			SKIN,
+			EMAIL,
+			NUMBER,
+			PHONE
+		from 
+			SYS_USER
+		where 
+			NUMBER = #{NUMBER}
+		<if test="USERNAME != null and USERNAME != ''">
+			and USERNAME != #{USERNAME} 
+		</if>
+	</select>
+	
+	<!-- 通过USERNAME获取数据 -->
+	<select id="findByUId" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			USER_ID,
+			USERNAME,
+			PASSWORD,
+			NAME,
+			RIGHTS,
+			ROLE_ID,
+			LAST_LOGIN,
+			IP,
+			STATUS,
+			BZ,
+			SKIN,
+			EMAIL,
+			NUMBER,
+			PHONE
+		from 
+			SYS_USER
+		where 
+			USERNAME = #{USERNAME}
+	</select>
+	
+	<!-- 新增用户 -->
+	<insert id="saveU" parameterType="pd" flushCache="false">
+		insert into SYS_USER (
+			USERNAME,
+			PASSWORD,
+			NAME,
+			RIGHTS,
+			ROLE_ID,
+			LAST_LOGIN,
+			IP,
+			STATUS,
+			BZ,
+			SKIN,
+			EMAIL,
+			NUMBER,
+			PHONE,
+			DEPARTMENT_ID
+		) values (
+			#{USERNAME},
+			#{PASSWORD},
+			#{NAME},
+			#{RIGHTS},
+			#{ROLE_ID},
+			#{LAST_LOGIN},
+			#{IP},
+			#{STATUS},
+			#{BZ},
+			#{SKIN},
+			#{EMAIL},
+			#{NUMBER},
+			#{PHONE},
+			#{departmentId}
+		)
+	</insert>
+	<!-- 用户列表(用户组) -->
+	<select id="userlistPage" parameterType="page" resultType="pd" useCache="false">
+		SELECT  
+				u.USER_ID,
+				u.USERNAME,
+				u.PASSWORD,
+				u.LAST_LOGIN,
+				u.NAME,
+				u.IP,
+				u.EMAIL,
+				u.NUMBER,
+				u.PHONE,
+				u.ROLE_ID         AS role_id,
+				r.name            AS role_name,
+				u.department_id,
+				d.department_name AS departmentName
+		FROM 
+				SYS_USER u
+			LEFT JOIN SYS_ROLE r on u.ROLE_ID = r.id
+			LEFT JOIN sys_department d ON u.department_id = d.id
+			JOIN (SELECT getChildCompanyIdList(#{pd.currUdepId}) AS idList) L
+		WHERE  
+				u.USERNAME != 'admin'
+			AND u.is_delete=0
+			AND FIND_IN_SET(u.department_id,L.idList)
+		<if test="pd.keyWord != null and pd.keyWord != ''"><!-- 关键词检索 -->
+			AND
+				(
+					 u.NUMBER LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 u.USERNAME LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 u.EMAIL LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%') 
+					 OR
+					 u.NUMBER LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 u.NAME LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 u.PHONE LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+					 OR
+					 d.department_name LIKE CONCAT(CONCAT('%', #{pd.keyWord}),'%')
+				)
+		</if>
+		<if test="pd.ROLE_ID != null and pd.ROLE_ID != ''"><!-- 角色检索 -->
+			AND u.ROLE_ID=#{pd.ROLE_ID} 
+		</if>
+		<if test="pd.lastLoginStart!=null and pd.lastLoginStart!=''"><!-- 登录时间检索 -->
+			AND u.LAST_LOGIN &gt;= #{pd.lastLoginStart} 
+		</if>
+		<if test="pd.lastLoginEnd!=null and pd.lastLoginEnd!=''"><!-- 登录时间检索 -->
+			AND u.LAST_LOGIN &lt; DATE_ADD(#{pd.lastLoginEnd},INTERVAL 1 DAY)
+		</if>
+		ORDER BY u.NUMBER ASC
+	</select>
+	
+	<!-- 用户列表(全部) -->
+	<select id="listAllUser" parameterType="pd" resultType="pd" useCache="false">
+		SELECT  
+				u.USER_ID,
+				u.USERNAME,
+				u.PASSWORD,
+				u.LAST_LOGIN,
+				u.NAME,
+				u.IP,
+				u.EMAIL,
+				u.NUMBER,
+				u.PHONE,
+				r.name            AS role_name,
+				u.department_id,
+				d.department_name AS departmentName
+		FROM
+				SYS_USER u
+			LEFT JOIN SYS_ROLE r on u.ROLE_ID = r.id
+			LEFT JOIN sys_department d ON u.department_id = d.id
+			JOIN (SELECT getChildCompanyIdList(#{currUdepId}) AS idList) L
+		WHERE  
+				u.USERNAME != 'admin'
+			AND u.is_delete=0
+			AND FIND_IN_SET(u.department_id,L.idList)
+		<if test="keyWord != null and keyWord != ''"><!-- 关键词检索 -->
+			AND
+				(
+					 u.NUMBER LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+					 OR
+					 u.USERNAME LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+					 OR
+					 u.EMAIL LIKE CONCAT(CONCAT('%', #{keyWord}),'%') 
+					 OR
+					 u.NUMBER LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+					 OR
+					 u.NAME LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+					 OR
+					 u.PHONE LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+					 OR
+					 d.department_name LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				)
+		</if>
+		<if test="ROLE_ID != null and ROLE_ID != ''"><!-- 角色检索 -->
+			AND u.ROLE_ID=#{ROLE_ID} 
+		</if>
+		<if test="lastLoginStart!=null and lastLoginStart!=''"><!-- 登录时间检索 -->
+			AND u.LAST_LOGIN &gt;= #{lastLoginStart} 
+		</if>
+		<if test="lastLoginEnd!=null and lastLoginEnd!=''"><!-- 登录时间检索 -->
+			AND u.LAST_LOGIN &lt; DATE_ADD(#{lastLoginEnd},INTERVAL 1 DAY)
+		</if>
+		ORDER BY u.NUMBER ASC
+	</select>
+	
+	<!-- 删除用户 -->
+	<delete id="deleteU" parameterType="pd" flushCache="false">
+		UPDATE
+				sys_user
+		SET
+				is_delete=1
+		WHERE
+				user_id = #{userId}
+	</delete>
+	
+	<!-- 批量删除用户 -->
+	<delete id="deleteAllU" parameterType="String" flushCache="false">
+		UPDATE
+				sys_user
+		SET
+				is_delete=1
+		WHERE 
+				user_id in
+  			 <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                  #{item}
+             </foreach>
+	</delete>
+	
+</mapper>

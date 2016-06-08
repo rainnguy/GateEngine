@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MenuMapper">
+
+	<resultMap type="Menu" id="menuResultMap">
+		<id column="menu_id" property="menu_id"/>
+		<result column="menu_name" property="menu_name"/>
+		<result column="menu_url" property="menu_url"/>
+		<result column="parent_id" property="parent_id"/>
+		<result column="menu_order" property="menu_order"/>
+		<result column="menu_icon" property="menu_icon"/>
+		<result column="menu_type" property="menu_type"/>
+		<result column="menu_sys" property="menu_sys"/>
+	</resultMap>
+
+	<select id="findMaxId" parameterType="pd" resultType="pd">
+		select MAX(menu_id) MID FROM SYS_MENU
+	</select>
+	
+	<select id="listAllParentMenu" resultMap="menuResultMap" parameterType="pd">
+		select * from SYS_MENU 
+		where parent_id = '0' order by menu_order 
+	</select>
+	
+	<select id="listSubMenuByParentId" parameterType="String" resultMap="menuResultMap">
+		select  * from SYS_MENU
+		where parent_id = #{parentId} order by menu_order 
+	</select>
+	
+	<select id="findAllMenuForRole" parameterType="map" resultMap="menuResultMap">
+		select  m.* from SYS_MENU m
+		<if test="role_id != null and role_id != ''">
+			left join sys_role_menu rm on m.menu_id = rm.menu_id
+			where rm.role_id = #{role_id} and m.menu_sys = 1
+		</if>
+		<if test="role_id == null or role_id == ''">
+			where m.menu_sys = 1
+		</if>
+		order by m.menu_order 
+	</select>
+		
+	<select id="getMenuById" parameterType="pd" resultType="pd">
+		select  menu_id,
+		 		menu_name,
+		 		menu_url,
+		 		parent_id,
+		 		menu_order,
+		 		menu_type,
+		 		menu_sys
+		 from SYS_MENU 
+		 where menu_id=#{menu_id}
+	</select>
+	
+	
+	<insert id="insertMenu" parameterType="Menu">
+		insert into SYS_MENU (
+			menu_id,
+			menu_name,
+			menu_url,
+			parent_id,
+			menu_order,
+			menu_type
+		) values (
+			#{menu_id},
+			#{menu_name},
+			#{menu_url},
+			#{parent_id},
+			#{menu_order},
+			#{menu_type}
+		)
+	</insert>
+	
+	<update id="updateMenu" parameterType="Menu">
+		update SYS_MENU set 
+			menu_name =#{menu_name},
+			menu_url  =#{menu_url} ,
+			parent_id =#{parent_id},
+			menu_order=#{menu_order},
+			menu_type =#{menu_type}
+		where 
+			menu_id=#{menu_id}
+	</update>
+	
+	<update id="editicon" parameterType="Menu">
+		update SYS_MENU set 
+			menu_icon=#{menu_icon}
+		where menu_id=#{menu_id}
+	</update>
+	
+	<update id="editType" parameterType="Menu">
+		update SYS_MENU set 
+			menu_type=#{menu_type}
+		where parent_id=#{menu_id}
+	</update>
+	
+	<delete id="deleteMenuById" parameterType="String">
+		delete from SYS_MENU 
+		where menu_id=#{menu_id} 
+		or parent_id=#{menu_id}
+	</delete>
+	
+	<!-- 根据用户角色获得权限菜单 -->
+	<select id="listAllParentMenuByUserRole" resultMap="menuResultMap" parameterType="pd">
+		select 
+			sm.* 
+		from sys_role_menu srm
+		left join sys_menu sm on srm.menu_id = sm.menu_id
+		where 
+			role_id = #{role_id} 
+			and sm.parent_id = #{parent_id}
+		order by sm.menu_order;
+	</select>
+	
+</mapper>

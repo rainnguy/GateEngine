@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DictionaryMapper">
+	
+	<resultMap type="Dictionary" id="dictionaryResultMap">
+		<id property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="name" column="name"/>
+		<result property="value" column="value"/>
+		<result property="sort" column="sort"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="createUser" column="create_user"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateUser" column="update_user"/>
+		<result property="updateDate" column="update_date"/>
+	</resultMap>
+	
+	<!-- 根据机构ID查询本机构及下级机构 -->
+	<select id="listDictionary" parameterType="map" resultMap="dictionaryResultMap">
+		select 
+			name,
+			value
+		from dictionary 
+		where 
+			type = #{type}
+		
+		<if test="operateType == 'add' and value != null and value != ''">
+			and value &gt; #{value}
+		</if>
+		
+		order by sort
+	</select>
+	
+	<!-- 根据type和value取出name -->
+	<select id="queryDictionaryNameByTypeAndValue" parameterType="map" resultMap="dictionaryResultMap">
+		select 
+			name,
+			value
+		from dictionary 
+		where 
+			type = #{type} and value = #{value}
+	</select>
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TransStatisticMapper">
+	
+	   <resultMap type="TransStatistic" id="transStatisticResultMap">
+	   		<result property="departmentId"    column="department_id"/>
+	   		<result property="departmentName"  column="department_name"/>
+	   		<result property="departmentType"  column="department_type"/>
+	   		<result property="mid"             column="mid"/>
+	   		<result property="acqName"        column="acq_name"/>
+	   		<result property="allMids"         column="allMids"/>
+	       	<result property="transNum"        column="trans_num"/>
+	       	<result property="transAggregate"  column="trans_aggregate"/>
+	   </resultMap>
+	   
+	   <resultMap type="TransType" id="transTypeResultMap">
+	   		<id property="txnId"        column="TXN_ID"/>
+	   		<result property="txnName"  column="TXN_NAME"/> 
+	   </resultMap>
+	   
+	   <!-- 统计交易总笔数 -->
+	   <select id="calTransNumByCondition" parameterType="pd" resultMap="transStatisticResultMap">
+	   		SELECT
+	   				COUNT(*) AS trans_num
+	   		FROM
+				(
+					SELECT
+							TXN_ID
+				 	FROM
+				 			jsfr.HIST_TRANS
+				 			<include refid="dynamic" />
+				 			and TRAN_STATUS = 1
+				 UNION ALL
+				 	SELECT
+				 			TXN_ID
+				 	FROM
+				 			jsfr.TRANS
+				 			<include refid="dynamic" />
+				 			and TRAN_STATUS = 1
+				 )R
+	   </select>
+	   
+	   <!-- 统计交易总金额 -->
+	   <select id="calTransAggregateByCondition" parameterType="pd" resultMap="transStatisticResultMap">
+	   		SELECT
+	   				SUM(NVL(TXN_AMT,0)) AS trans_aggregate
+	   		FROM
+				(
+					SELECT
+							SUM(NVL(TXN_AMT,0)) as TXN_AMT
+				 	FROM
+				 			jsfr.HIST_TRANS
+				 			<include refid="dynamic" />
+				 			and TRAN_STATUS = 1
+				 UNION ALL
+				 	SELECT
+				 			SUM(NVL(TXN_AMT,0)) as TXN_AMT
+				 	FROM
+				 			jsfr.TRANS
+				 			<include refid="dynamic" />
+				 			and TRAN_STATUS = 1
+				 ) R
+	   </select>
+	   
+	   <sql id="dynamic">
+	   		<where>
+	   					1=1
+	   			<!-- 终端号 -->
+	   			<if test="pd.tid != null and pd.tid != '' ">
+	   				AND TID = #{pd.tid}
+	   			</if>
+	   			<!-- 交易类型 -->
+	   			<if test="pd.txnId != null and pd.txnId != '' and pd.txnId != 0 ">
+	   				AND TXN_ID = #{pd.txnId}
+	   			</if>
+	   			<!-- 批次号 -->
+	   			<if test="pd.batchNo != null and pd.batchNo != '' ">
+	   				AND BATCH_NO = #{pd.batchNo}
+	   			</if>
+	   			<!-- 交易时间 （起始）-->
+	   			<if test="pd.tranStartDate != null and pd.tranStartDate != '' ">
+	   				AND TRAN_DATE &gt;= to_date(#{pd.tranStartDate},'yyyy-mm-dd hh24:mi:ss')
+	   			</if>
+	   			<!-- 交易时间 （结束） -->
+	   			<if test="pd.tranEndDate != null and pd.tranEndDate != '' ">
+	   				AND TRAN_DATE &lt;= to_date(#{pd.tranEndDate},'yyyy-mm-dd hh24:mi:ss')
+	   			</if>
+	   			<!-- 卡号 -->
+	   			<if test="pd.pan != null and pd.pan != '' ">
+	   				<![CDATA[   and PAN = '${pd.pan}'  ]]>
+	   			</if>
+	   			<!-- 发卡行 -->
+	   			<if test="pd.bankNo != null and pd.bankNo != '' ">
+	   				AND BANK_NO = LPAD (#{pd.bankNo} , 4 , '0')
+	   			</if>
+	   			<if test="pd.allMids != null and pd.allMids != '' ">
+	   				AND MID IN (${pd.allMids})
+	   			</if>
+	   		</where>
+	   </sql>
+	   
+		<!-- 查询所有的交易类型 -->
+	   	<select id="listAllTransType" resultMap="transTypeResultMap">
+			SELECT
+					TXN_ID,
+					TXN_NAME
+			FROM
+					jsfr.TXN_NAME
+		</select>
+	   	
+	   	<!-- 查询所有需要统计的部门的信息 分页查询用 -->
+		<select id="listPageAllStatisticDep" parameterType="pd" resultMap="transStatisticResultMap">
+			SELECT 
+					d.id                  AS department_id,
+					d.department_name     AS department_name,
+					d.department_type     AS department_type,
+					d.merchant_num        AS mid,
+					d.merchant_name       AS acq_name,
+					getChildMidList(d.id) AS allMids
+			FROM
+					sys_department d
+				JOIN (SELECT getChildCompanyIdList(#{pd.userDepartmentId}) AS idList) L
+			WHERE 
+					d.is_delete = 1
+			<!-- 机构名称、商户名称、商户号都不存在时按id、parentId来取 -->
+			<if test="pd.showNav == 1 ">
+				<if test="pd.parentId != null">
+					AND d.parent_id = #{pd.parentId}
+				</if>	
+				<if test="pd.parentId == null">
+					AND d.id = #{pd.id}
+				</if>
+			</if>
+   			<!-- 商户号 -->
+   			<if test="pd.showNav != 1 ">
+				<if test="pd.mid != null and pd.mid != '' ">
+		   			AND d.merchant_num = #{pd.mid}
+		   		</if>
+		   		<!-- 根据公司名称和商户名称查出来的商户号 -->
+				<if test="pd.queryMids != null and pd.queryMids != '' ">
+		   			AND d.merchant_num IN (${pd.queryMids})
+		   		</if>
+	   		</if>
+	   			AND FIND_IN_SET(d.id,L.idList)
+		</select>
+		
+		<!-- 查询所有需要统计的部门的信息 导出用 -->
+		<select id="listAllStatisticDep" parameterType="pd" resultMap="transStatisticResultMap">
+			SELECT 
+					d.id                  AS department_id,
+					d.department_name     AS department_name,
+					d.department_type     AS department_type,
+					d.merchant_num        AS mid,
+					d.merchant_name       AS acq_name,
+					getChildMidList(d.id) AS allMids
+			FROM
+					sys_department d
+				JOIN (SELECT getChildCompanyIdList(#{pd.userDepartmentId}) AS idList) L
+			WHERE 
+					d.is_delete = 1
+			<!-- 机构名称、商户名称、商户号都不存在时按id、parentId来取 -->
+			<if test="pd.showNav == 1 ">
+				<if test="pd.parentId != null">
+					AND d.parent_id = #{pd.parentId}
+				</if>	
+				<if test="pd.parentId == null">
+					AND d.id = #{pd.id}
+				</if>
+			</if>
+   			<!-- 商户号 -->
+   			<if test="pd.showNav != 1 ">
+				<if test="pd.mid != null and pd.mid != '' ">
+		   			AND d.merchant_num = #{pd.mid}
+		   		</if>
+		   		<!-- 根据公司名称和商户名称查出来的商户号 -->
+				<if test="pd.queryMids != null and pd.queryMids != '' ">
+		   			AND d.merchant_num IN (${pd.queryMids})
+		   		</if>
+	   		</if>
+	   			AND FIND_IN_SET(d.id,L.idList)
+		</select>
+</mapper>

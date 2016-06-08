@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="FusionChartsMapper">
+		<resultMap type="FusionCharts" id="fusionChartsResultMap">
+	       	<result property="date" column="query_tran_date"/>
+	       	<result property="money" column="money"/>
+   		</resultMap>
+	   	<!-- 查询交易信息列表 -->
+   		<select id="querhWeekCharts" parameterType="pd" resultMap="fusionChartsResultMap">
+   			select query_tran_date,sum(NVL(money,0)) as money from (
+		      		select 
+		      			to_char(tran_date,'yyyy-MM-dd') as query_tran_date,
+		      			sum(NVL(txn_amt,0)) as money
+					from jsfr.hist_trans
+		          	<where>
+		          		tran_status = 1
+		          		and TXN_ID in ('2','6')
+		          		<!-- 用户可查询范围商户号 -->
+		          		and mid in (${midStr})
+		            	and to_char(tran_date,'yyyy-MM-dd') in (${queryDatePd})
+		         	</where>
+		         	group by to_char(tran_date,'yyyy-MM-dd')
+	         	union all
+	         		select 
+		      			to_char(tran_date,'yyyy-MM-dd') as query_tran_date,
+		      			sum(NVL(txn_amt,0)) as money
+					from jsfr.trans
+		          	<where>
+		          		tran_status = 1
+		          		and TXN_ID in ('2','6')
+		          		<!-- 用户可查询范围商户号 -->
+		          		and mid in (${midStr})
+		            	and to_char(tran_date,'yyyy-MM-dd') in (${queryDatePd})
+		         	</where>
+		         	group by to_char(tran_date,'yyyy-MM-dd')
+		     ) AA
+		     group by AA.query_tran_date
+   		</select>
+   		
+   		<!-- 查询月报数据 1年12个月 -->
+   		<select id="calMonthData" parameterType="pd" resultMap="fusionChartsResultMap">
+   			SELECT
+					R.query_tran_date  AS query_tran_date,
+					SUM(R.money)       AS money
+			FROM 
+				(
+					SELECT
+							to_char(TRAN_DATE,'mm') AS query_tran_date,
+							SUM(NVL(TXN_AMT,0))     AS money
+					FROM
+							jsfr.HIST_TRANS
+					WHERE
+							TRAN_STATUS = 1
+		          		and TXN_ID in ('2','6')
+						AND	MID IN (${midStr})
+						AND TRAN_DATE &gt;= to_date(#{startDate},'yyyy-mm-dd hh24:mi:ss')
+						AND TRAN_DATE &lt; to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+					GROUP BY
+							TRAN_DATE
+				UNION ALL
+					SELECT
+							to_char(TRAN_DATE,'mm') AS query_tran_date,
+							SUM(NVL(TXN_AMT,0))     AS money
+					FROM
+							jsfr.TRANS
+					WHERE
+							TRAN_STATUS = 1
+		          		and TXN_ID in ('2','6')
+						AND MID IN (${midStr})
+						AND TRAN_DATE &gt;= to_date(#{startDate},'yyyy-mm-dd hh24:mi:ss')
+						AND TRAN_DATE &lt; to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+					GROUP BY
+							TRAN_DATE
+				) R
+			GROUP BY
+					R.query_tran_date
+   		</select>
+   		
+   		<!-- 查询月报数据 1个月 -->
+   		<select id="calMonthDayData" parameterType="pd" resultMap="fusionChartsResultMap">
+   			SELECT
+					R.query_tran_date  AS query_tran_date,
+					SUM(R.money)       AS money
+			FROM 
+				(
+					SELECT
+							to_char(TRAN_DATE,'dd') AS query_tran_date,
+							SUM(NVL(TXN_AMT,0))     AS money
+					FROM
+							jsfr.HIST_TRANS
+					WHERE
+							TRAN_STATUS = 1
+		          		and TXN_ID in ('2','6')
+						AND MID IN (${midStr})
+						AND TRAN_DATE &gt;= to_date(#{startDate},'yyyy-mm-dd hh24:mi:ss')
+						AND TRAN_DATE &lt; to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+					GROUP BY
+							TRAN_DATE
+				UNION ALL
+					SELECT
+							to_char(TRAN_DATE,'dd') AS query_tran_date,
+							SUM(NVL(TXN_AMT,0))     AS money
+					FROM
+							jsfr.TRANS
+					WHERE
+							TRAN_STATUS = 1
+		          		and TXN_ID in ('2','6')
+						AND MID IN (${midStr})
+						AND TRAN_DATE &gt;= to_date(#{startDate},'yyyy-mm-dd hh24:mi:ss')
+						AND TRAN_DATE &lt; to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+					GROUP BY
+							TRAN_DATE
+				) R
+			GROUP BY
+					R.query_tran_date
+   		</select>
+   		
+	</mapper>

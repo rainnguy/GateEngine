@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="POSMachineMapper">
+	
+	<resultMap type="POSMachine" id="pOSMachineResultMap">
+		<id property="id" column="id"/>
+		<result property="departmentId" column="department_id"/>
+		<result property="departmentName" column="department_name"/>
+		<result property="posNumber" column="pos_number"/>
+		<result property="remark" column="remark"/>
+		<result property="mailedDate" column="mailed_date"/>
+		<result property="machineProperty" column="machine_property"/>
+		<result property="machineModel" column="machine_model"/>
+		<result property="machineSerialNumber" column="machine_serial_number"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="createUser" column="create_user"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateUser" column="update_user"/>
+		<result property="updateDate" column="update_date"/>
+	</resultMap>
+	
+	<!-- 根据机构ID查询本机构及下级机构 -->
+	<select id="listPosByStationIdlistPage" parameterType="pd" resultMap="pOSMachineResultMap">
+		select p.id,p.department_id,p.remark,sd.department_name,p.pos_number,
+			mailed_date,machine_property,machine_model,
+			machine_serial_number 
+		from pos_machine p
+		left join sys_department sd on p.department_id = sd.id
+		where sd.is_delete = 1 and p.is_delete = 1
+		and sd.id = #{pd.departmentId}
+	</select>
+	
+	<!-- 新增POS机-->
+	<insert id="insertPOSMachine" parameterType="pd" flushCache="false">
+		insert into pos_machine (
+			department_id,
+			pos_number,
+			mailed_date,
+			machine_property,
+			machine_model,
+			machine_serial_number,
+			remark,
+			create_user,
+			create_date
+		) values (
+			#{departmentId},
+			#{posNumber},
+			#{mailedDate},
+			#{machineProperty},
+			#{machineModel},
+			#{machineSerialNumber},
+			#{remark},
+			#{createUser},
+			now()
+		)
+	</insert>
+	
+	<!-- 编辑保存POS机信息 -->
+	<update id="updatePOSMachine" parameterType="pd" flushCache="false">
+		update  
+			pos_machine
+		set pos_number = #{posNumber},
+			remark = #{remark},
+			mailed_date = #{mailedDate},
+			machine_property = #{machineProperty},
+			machine_model = #{machineModel},
+			machine_serial_number = #{machineSerialNumber},
+			update_user = #{updateUser},
+			update_date = now()
+		where 
+			id = #{id}
+	</update>
+	
+	<!-- 删除POS机信息 -->
+	<update id="deletePOSMachine" parameterType="pd" flushCache="false">
+		update pos_machine
+		set is_delete = 2
+		where id = #{id}
+	</update>
+	
+	<!-- 判断POS机是否存在 -->
+	<select id="hasPOSMachine" parameterType="pd" resultMap="pOSMachineResultMap">
+		select id from pos_machine
+		where is_delete = 1 and pos_number = #{posNumber}
+		<if test="id != null and id != 'undefined'">
+			and id != #{id}
+		</if>
+	</select>
+	
+	<!-- 根据id查询POS机信息 -->
+	<select id="queryPOSMachineById" parameterType="String" resultMap="pOSMachineResultMap">
+		select id,department_id,pos_number,date_format(mailed_date,'%Y-%m-%d') as mailed_date,machine_property,machine_model,
+				machine_serial_number,remark,create_user,create_date,update_user,update_date
+		from pos_machine
+		where is_delete = 1 and id = #{id}
+	</select>
+</mapper>

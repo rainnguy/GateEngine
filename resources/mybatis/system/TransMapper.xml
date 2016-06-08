@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="TransMapper">
+	
+   		<resultMap type="Trans" id="tradingtheResultMap">
+       		<id property="id" column="id"/>
+	       	<result property="txnId" column="txn_id"/>
+	       	<result property="mesgFlag" column="mesg_flag"/>
+	       	<result property="messageType" column="message_type"/>
+	       	<result property="biTmap" column="bitmap"/>
+	       	<result property="pan" column="pan"/>
+	       	<result property="processCode" column="process_code"/>
+	       	<result property="txnAmt" column="txn_amt"/>
+	       	<result property="transDt" column="trans_d_t"/>
+	       	<result property="sysTrace" column="systrace"/>
+	       	<result property="txnTlme" column="txn_tlme"/>
+	       	<result property="expDate" column="exp_date"/>
+	       	<result property="settleDate" column="settle_date"/>
+	       	<result property="captureDate" column="capture_date"/>
+	       	<result property="merchantType" column="merchant_type"/>
+	       	<result property="serEntcode" column="ser_entcode"/>
+	       	<result property="netLl" column="net_11"/>
+	       	<result property="serConcode" column="ser_concode"/>
+	       	<result property="pinCapaode" column="pin_capaode"/>
+	       	<result property="issueBankid" column="issue_bank_id"/>
+	       	<result property="acquireBankid" column="acquire_bank_id"/>
+	       	<result property="trK2" column="trk2"/>
+	       	<result property="trK3" column="trk3"/>
+	       	<result property="rrN" column="rrn"/>
+	       	<result property="authCode" column="auth_code"/>
+	       	<result property="respCode" column="resp_code"/>
+	       	<result property="tid" column="tid"/>
+	       	<result property="mid" column="mid"/>
+	       	<result property="acpName" column="acq_name"/>
+	       	<result property="add44" column="add_44"/>
+	       	<result property="trKl" column="trkl"/>
+	       	<result property="addData48" column="add_data48"/>
+	       	<result property="currencyCode" column="currency_code"/>
+	       	<result property="pinData" column="pin_data"/>
+	       	<result property="secuInfo" column="secu_info"/>
+	       	<result property="addAnount" column="add_anount"/>
+	       	<result property="priV61" column="priv61"/>
+	       	<result property="priV62" column="priv62"/>
+	       	<result property="priV63" column="priv63"/>
+       		<result property="mac" column="mac"/>
+	       	<result property="cardSeqno" column="card_seq_no"/>
+	       	<result property="icrelatedData" column="ic_related_data"/>
+	       	<result property="bocPrivData" column="boc_priv_data"/>
+      		<result property="privSeqNo" column="priv_seq_no"/>
+	       	<result property="batchNo" column="batch_no"/>
+	       	<result property="merNo" column="mer_no"/>
+	       	<result property="bankNo" column="bank_no"/>
+	       	<result property="posNo" column="pos_no"/>
+	       	<result property="tellerNo" column="teller_no"/>
+	       	<result property="customId" column="custom_id"/>
+	       	<result property="customId1" column="custom_id1"/>
+	       	<result property="oldSystrace" column="old_systrace"/>
+	       	<result property="oldauThcode" column="old_auth_code"/>
+	       	<result property="oldRrn" column="old_rrn"/>
+	       	<result property="voidTellerNo" column="void_teller_no"/>
+	       	<result property="voidPosNo" column="void_pos_no"/>
+	       	<result property="oldPosSystrace" column="old_pos_systrace"/>
+	       	<result property="refundedAmt" column="refunded_amt"/>
+	       	<result property="tranStatus" column="tran_status"/>
+	       	<result property="settStatus" column="sett_status"/>
+	       	<result property="tranDate" column="tran_date"/>
+	       	<result property="txnName" column="txn_name"/>
+   		</resultMap>
+	   
+	   	<!-- 查询交易信息列表 -->
+   		<select id="dllTranslistPage" parameterType="pd" resultMap="tradingtheResultMap">
+   			select * from (
+	      		select 
+		      		t.acq_name,
+			      	t.mid,
+			      	t.pan,
+			      	t.bank_no,
+			      	tn.txn_name,
+			      	t.batch_no,
+			      	t.custom_id,
+			      	t.auth_code,
+			      	t.tid,
+			      	t.rrn,
+			      	t.systrace as custom_id1,
+			      	t.txn_amt,
+			      	to_char(t.tran_date,'yyyy-mm-dd hh24:mi:ss') as tran_date,
+			      	t.txn_id,
+		          	t.tran_status 
+	         	from jsfr.trans t
+	         	left join jsfr.txn_name tn on t.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		t.mid in (${pd.midStr})
+	            	<if test="pd.acqName!=null and pd.acqName!=''">
+	            		<!-- 商户名称 -->
+	                	and t.acq_name like '%${pd.acqName}%'
+	             	</if>
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND t.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND t.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.txnId!=null and pd.txnId!=''">
+	            		<!-- 交易类型 -->
+	                	AND t.txn_id = #{pd.txnId}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND t.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and t.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and t.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND t.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND t.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+         	union 
+	         	select 
+		      		'',
+			      	ht.mid,
+			      	ht.pan,
+			      	ht.bank_no,
+			      	tn.txn_name,
+			      	ht.batch_no,
+			      	ht.custom_id,
+			      	ht.auth_code,
+			      	ht.tid,
+			      	ht.rrn,
+			      	ht.systrace as custom_id1,
+			      	ht.txn_amt,
+			      	to_char(ht.tran_date,'yyyy-mm-dd hh24:mi:ss') as tran_date,
+			      	ht.txn_id,
+		          	ht.tran_status 
+	         	from jsfr.hist_trans ht
+	         	left join jsfr.txn_name tn on ht.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		ht.mid in (${pd.midStr}) 
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND ht.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND ht.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.txnId!=null and pd.txnId!=''">
+	            		<!-- 交易类型 -->
+	                	AND ht.txn_id = #{pd.txnId}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND ht.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and ht.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and ht.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND ht.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND ht.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+	         ) AA order by AA.tran_date desc
+   		</select>
+   		
+   		
+   			<!-- 查询交易信息列表 -->
+   		<select id="ExceptionTransDllTranslistPage" parameterType="pd" resultMap="tradingtheResultMap">
+   			select * from (
+	      		select 
+		      		t.acq_name,
+			      	t.mid,
+			      	t.pan,
+			      	t.bank_no,
+			      	tn.txn_name,
+			      	t.batch_no,
+			      	t.custom_id,
+			      	t.auth_code,
+			      	t.tid,
+			      	t.rrn,
+			      	t.systrace as custom_id1,
+			      	t.txn_amt,
+			      	to_char(t.tran_date,'yyyy-mm-dd hh24:mi:ss') as tran_date,
+			      	t.txn_id,
+		          	t.tran_status 
+	         	from jsfr.trans t
+	         	left join jsfr.txn_name tn on t.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		t.mid in (${pd.midStr}) and t.tran_status != 1 and t.resp_code &lt;&gt; '00'
+	            	<if test="pd.acqName!=null and pd.acqName!=''">
+	            		<!-- 商户名称 -->
+	                	and t.acq_name like '%${pd.acqName}%'
+	             	</if>
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND t.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND t.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND t.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and t.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and t.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND t.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND t.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+         	union 
+	         	select 
+		      		'',
+			      	ht.mid,
+			      	ht.pan,
+			      	ht.bank_no,
+			      	tn.txn_name,
+			      	ht.batch_no,
+			      	ht.custom_id,
+			      	ht.auth_code,
+			      	ht.tid,
+			      	ht.rrn,
+			      	ht.systrace as custom_id1,
+			      	ht.txn_amt,
+			      	to_char(ht.tran_date,'yyyy-mm-dd hh24:mi:ss') as tran_date,
+			      	ht.txn_id,
+		          	ht.tran_status 
+	         	from jsfr.hist_trans ht
+	         	left join jsfr.txn_name tn on ht.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		ht.mid in (${pd.midStr}) and ht.tran_status != 1 and ht.resp_code &lt;&gt; '00'
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND ht.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND ht.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND ht.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and ht.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and ht.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND ht.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND ht.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+	         ) AA order by AA.tran_date desc
+   		</select>
+   		
+   		
+   		
+   		<!-- 导出交易信息列表 -->
+   		<select id="dllTransForExcel" parameterType="pd" resultMap="tradingtheResultMap">
+	      		select 
+		      		t.acq_name,
+			      	t.mid,
+			      	t.pan,
+			      	t.bank_no,
+			      	tn.txn_name,
+			      	t.batch_no,
+			      	t.custom_id,
+			      	t.auth_code,
+			      	t.tid,
+			      	t.rrn,
+			      	t.systrace as custom_id1,
+			      	t.txn_amt,
+			      	t.tran_date,
+			      	t.txn_id,
+		          	t.tran_status 
+	         	from jsfr.trans t
+	         	left join jsfr.txn_name tn on t.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		t.mid in (${pd.midStr})
+	            	<if test="pd.acqName!=null and pd.acqName!=''">
+	            		<!-- 商户名称 -->
+	                	and t.acq_name like '%${pd.acqName}%'
+	             	</if>
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND t.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND t.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.txnId!=null and pd.txnId!=''">
+	            		<!-- 交易类型 -->
+	                	AND t.txn_id = #{pd.txnId}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND t.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and t.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and t.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND t.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND t.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	         	</where>
+         	union 
+	         	select 
+		      		'',
+			      	ht.mid,
+			      	ht.pan,
+			      	ht.bank_no,
+			      	tn.txn_name,
+			      	ht.batch_no,
+			      	ht.custom_id,
+			      	ht.auth_code,
+			      	ht.tid,
+			      	ht.rrn,
+			      	ht.systrace as custom_id1,
+			      	ht.txn_amt,
+			      	ht.tran_date,
+			      	ht.txn_id,
+		          	ht.tran_status 
+	         	from jsfr.hist_trans ht
+	         	left join jsfr.txn_name tn on ht.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		ht.mid in (${pd.midStr})
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND ht.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND ht.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.txnId!=null and pd.txnId!=''">
+	            		<!-- 交易类型 -->
+	                	AND ht.txn_id = #{pd.txnId}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND ht.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and ht.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and ht.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND ht.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND ht.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+   		</select>
+   		
+   		<!-- 导出异常交易数据 -->
+   		<select id="exceptionTransDllTransForExcel" parameterType="pd" resultMap="tradingtheResultMap">
+	      		select 
+		      		t.acq_name,
+			      	t.mid,
+			      	t.pan,
+			      	t.bank_no,
+			      	tn.txn_name,
+			      	t.batch_no,
+			      	t.custom_id,
+			      	t.auth_code,
+			      	t.tid,
+			      	t.rrn,
+			      	t.systrace as custom_id1,
+			      	t.txn_amt,
+			      	t.tran_date,
+			      	t.txn_id,
+		          	t.tran_status 
+	         	from jsfr.trans t
+	         	left join jsfr.txn_name tn on t.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		t.mid in (${pd.midStr})  and  t.tran_status != 1 and t.resp_code &lt;&gt; '00'
+	            	<if test="pd.acqName!=null and pd.acqName!=''">
+	            		<!-- 商户名称 -->
+	                	and t.acq_name like '%${pd.acqName}%'
+	             	</if>
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND t.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND t.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND t.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and t.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and t.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND t.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND t.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	         	</where>
+         	union 
+	         	select 
+		      		'',
+			      	ht.mid,
+			      	ht.pan,
+			      	ht.bank_no,
+			      	tn.txn_name,
+			      	ht.batch_no,
+			      	ht.custom_id,
+			      	ht.auth_code,
+			      	ht.tid,
+			      	ht.rrn,
+			      	ht.systrace as custom_id1,
+			      	ht.txn_amt,
+			      	ht.tran_date,
+			      	ht.txn_id,
+		          	ht.tran_status 
+	         	from jsfr.hist_trans ht
+	         	left join jsfr.txn_name tn on ht.txn_id = tn.txn_id
+	          	<where>
+	          		<!-- 用户可查询范围商户号 -->
+	          		ht.mid in (${pd.midStr}) and ht.tran_status != 1 and ht.resp_code &lt;&gt; '00'
+	             	<if test="pd.mid!=null and pd.mid!=''">
+	            		<!-- 商户号 -->
+	                	AND ht.mid = #{pd.mid}
+	             	</if>
+	             	<if test="pd.tid!=null and pd.tid!=''">
+	            		<!-- 终端号 -->
+	                	AND ht.tid = #{pd.tid}
+	             	</if>
+	             	<if test="pd.batchNo!=null and pd.batchNo!=''">
+	            		<!-- 批次号 -->
+	                	AND ht.batch_no = #{pd.batchNo}
+	             	</if>
+	             	<if test="pd.pan!=null and pd.pan !=''">
+	            		<!-- 卡号 -->
+	                	<![CDATA[   and ht.pan = '${pd.pan}'  ]]>
+	             	</if>
+	             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+	            		<!-- 发卡行 -->
+	                	and ht.bank_no = LPAD (#{pd.bankNo} , 4 , '0')
+	             	</if>
+	             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+	            		<!-- 开始日期不为空 -->
+	                	AND ht.tran_date &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+	             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+	            		<!-- 结束日期不为空 -->
+	                	AND ht.tran_date &lt;= to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')
+	             	</if>
+         		</where>
+   		</select>
+   		
+	</mapper>

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+	
+	<resultMap type="Role" id="roleResultMap">
+		<id column="id" property="id"/>
+		<result column="level" property="level"/>
+		<result column="levelName" property="levelName"/>
+		<result column="name" property="name"/>
+		<result column="remark" property="remark"/>
+		<result column="sort" property="sort"/>
+	</resultMap>
+	
+	
+	<!-- 权限 -->
+	<update id="c1" parameterType="pd">
+		update SYS_USER_QX 
+		set C1=#{value} 
+		where U_ID=#{kefu_id}
+	</update>
+	
+	<!-- 列出二级角色信息 -->
+	<select id="listAllERRoles" resultMap="roleResultMap" parameterType="pd">
+		select 
+			id,
+			name,
+			remark
+		from SYS_ROLE
+		where is_delete = 1
+		and level  &gt;= (select r.level from SYS_ROLE r where id = #{currUserRoleId}) 
+	</select>
+	
+	<!-- 列出会员二级角色信息 -->
+	<select id="listAllappERRoles" resultMap="roleResultMap">
+		select 
+			ROLE_ID,
+			ROLE_NAME,
+			RIGHTS,
+			PARENT_ID,
+			ADD_QX,
+			DEL_QX,
+			EDIT_QX,
+			CHA_QX,
+			QX_ID
+		from SYS_ROLE 
+		where 
+		 	PARENT_ID = '7'
+	</select>
+	
+	<!-- 列出此角色下的所有用户 -->
+	<select id="listAllUByRid"  parameterType="pd" resultType="pd" >
+		select USER_ID
+		from SYS_USER
+		where 
+		ROLE_ID = #{ROLE_ID}
+	</select>
+
+	<!-- 列出此角色下的所有会员 -->
+	<select id="listAllAppUByRid"  parameterType="pd" resultType="pd" >
+		select USER_ID
+		from SYS_APP_USER
+		where 
+		ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!-- 通过当前登录用的角色id获取管理权限数据 -->
+	<select id="findGLbyrid"  parameterType="pd" resultType="pd" >
+		SELECT 
+			b.GL_ID,
+			b.ROLE_ID,
+			b.FX_QX,
+			b.FW_QX,
+			b.QX1,
+			b.QX2,
+			b.QX3,
+			b.QX4
+		from SYS_ROLE a, SYS_GL_QX b, SYS_USER c
+		where 
+			a.QX_ID = b.GL_ID
+		and 
+			a.ROLE_ID = c.ROLE_ID
+		and
+			c.ROLE_ID =  '${ROLE_ID}'
+		
+		limit 0,1
+	</select>
+	
+	<!-- 通过当前登录用的角色id获取用户权限数据 -->
+	<select id="findYHbyrid"  parameterType="pd" resultType="pd" >
+		SELECT 
+			b.U_ID,
+			b.C1,
+			b.C2,
+			b.C3,
+			b.C4,
+			b.Q1,
+			b.Q2,
+			b.Q3,
+			b.Q4
+		from SYS_ROLE a, SYS_USER_QX b, SYS_USER c
+		where 
+			a.QX_ID = b.U_ID
+		and 
+			a.ROLE_ID = c.ROLE_ID
+		and
+			c.ROLE_ID =  '${ROLE_ID}'
+		limit 0,1
+	</select>
+	
+	<!-- 列出K权限表里的数据 -->
+	<select id="listAllkefu"  parameterType="pd" resultType="pd" >
+		select 
+			GL_ID,
+			ROLE_ID,
+			FX_QX,
+			FW_QX,
+			QX1,
+			QX2,
+			QX3,
+			QX4
+		from SYS_GL_QX
+	</select>
+	
+	<!-- 列出G权限表里的数据 -->
+	<select id="listAllGysQX"  parameterType="pd" resultType="pd" >
+		select 
+			U_ID,
+			C1,
+			C2,
+			C3,
+			C4,
+			Q1,
+			Q2,
+			Q3,
+			Q4
+		from SYS_USER_QX
+	</select>
+	
+	<!-- 给全部子职位加菜单权限 -->
+	<update id="setAllRights" parameterType="pd">
+		update SYS_ROLE 
+		set RIGHTS=#{rights} 
+		where PARENT_ID=#{roleId}
+	</update>
+	
+	<update id="add_qx" parameterType="pd">
+		update SYS_ROLE 
+		set ADD_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<update id="del_qx" parameterType="pd">
+		update SYS_ROLE 
+		set DEL_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<update id="edit_qx" parameterType="pd">
+		update SYS_ROLE 
+		set EDIT_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<update id="cha_qx" parameterType="pd">
+		update SYS_ROLE 
+		set CHA_QX=#{value} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	
+	<update id="kfqx1" parameterType="pd">
+		update SYS_GL_QX 
+		set QX1=#{value} 
+		where GL_ID=#{kefu_id}
+	</update>
+	
+	<update id="kfqx2" parameterType="pd">
+		update SYS_GL_QX 
+		set QX2=#{value} 
+		where GL_ID=#{kefu_id}
+	</update>
+	
+	<update id="fxqx" parameterType="pd">
+		update SYS_GL_QX 
+		set FX_QX=#{value} 
+		where GL_ID=#{kefu_id}
+	</update>
+	
+	<update id="fwqx" parameterType="pd">
+		update SYS_GL_QX 
+		set FW_QX=#{value} 
+		where GL_ID=#{kefu_id}
+	</update>
+	
+	<select id="listAllRoleslistPage" parameterType="pd" resultMap="roleResultMap">
+		select 
+			id,
+			case when level = 1 then '系统级用户'
+       			 when level = 2 then '公司级用户'
+		         when level = 3 then '站级用户'
+	      	end as levelName,
+			name,
+			remark
+		from SYS_ROLE 
+		where is_delete = 1
+		<if test="pd.name != null and pd.name != ''">
+		 and name LIKE CONCAT(CONCAT('%', #{pd.name}),'%')
+		</if>
+		ORDER BY sort
+	</select>
+	
+	<select id="listAllRolesByPId" resultMap="roleResultMap">
+		select 
+			ROLE_ID,
+			ROLE_NAME,
+			RIGHTS,
+			PARENT_ID,
+			ADD_QX,
+			DEL_QX,
+			EDIT_QX,
+			CHA_QX,
+			QX_ID
+		from SYS_ROLE  
+		where 
+			PARENT_ID = #{ROLE_ID}
+		ORDER BY ROLE_ID
+	</select>
+	
+
+	<select id="getRoleById" parameterType="String" resultMap="roleResultMap">
+		select * from SYS_ROLE 
+		where id=#{roleId}
+	</select>
+	
+	
+	<update id="updateRoleRights" parameterType="Role">
+		update SYS_ROLE 
+		set RIGHTS=#{RIGHTS} 
+		where ROLE_ID=#{ROLE_ID}
+	</update>
+	<delete id="deleteRoleById" parameterType="String">
+		delete from SYS_ROLE 
+		where ROLE_ID=#{ROLE_ID}
+	</delete>
+	
+	<!-- 删除K权限表里对应的数据 -->
+	<delete id="deleteKeFuById" parameterType="String">
+		delete from SYS_GL_QX 
+		where GL_ID = #{ROLE_ID}
+	</delete>
+	
+	<!-- 删除G权限表里对应的数据 -->
+	<delete id="deleteGById" parameterType="String">
+		delete from SYS_USER_QX 
+		where U_ID = #{ROLE_ID}
+	</delete>
+	
+	<!-- 保存K权限 -->
+	<insert id="saveKeFu" parameterType="pd">
+		insert into SYS_GL_QX (
+			GL_ID,
+			ROLE_ID,
+			FX_QX,
+			FW_QX,
+			QX1,
+			QX2,
+			QX3,
+			QX4
+		) values (
+			#{GL_ID},
+			#{ROLE_ID},
+			#{FX_QX},
+			#{FW_QX},
+			#{QX1},
+			#{QX2},
+			#{QX3},
+			#{QX4}
+		)
+	</insert>
+	
+	<!-- 保存G权限 -->
+	<insert id="saveGYSQX" parameterType="pd">
+		insert into SYS_USER_QX (
+			U_ID,
+			C1,
+			C2,
+			C3,
+			C4,
+			Q1,
+			Q2,
+			Q3,
+			Q4
+		) values (
+			#{U_ID},
+			#{C1},
+			#{C2},
+			#{C3},
+			#{C4},
+			#{Q1},
+			#{Q2},
+			#{Q3},
+			#{Q4}
+		)
+	</insert>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="Role">
+		insert into SYS_ROLE (
+			name,
+			level,
+			remark,
+			sort
+		)
+		select #{name},#{level},#{remark},max(sort)+1 as sort from sys_role;
+		
+		<selectKey keyProperty="id" resultType="int">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<!-- 通过id查找 -->
+	<select id="findObjectById" parameterType="pd" resultType="pd">
+		select  
+			ROLE_ID,
+			ROLE_NAME,
+			RIGHTS,
+			PARENT_ID,
+			ADD_QX,
+			DEL_QX,
+			EDIT_QX,
+			CHA_QX
+		from SYS_ROLE
+		where ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!-- 编辑角色 -->
+	<update id="edit" parameterType="pd">
+		update SYS_ROLE 
+		set name = #{name},remark = #{remark},level = #{level}
+		where id = #{id}
+	</update>
+	<!-- 删除角色  逻辑删除 -->
+	<update id="deleteRole" parameterType="pd">
+		update SYS_ROLE 
+		set is_delete = 2
+		where id = #{id}
+	</update>
+	<!-- 删除角色菜单 -->
+	<delete id="deleteRoleMenuById" parameterType="map">
+		delete from sys_role_menu 
+		where role_id=#{role_id}
+	</delete>
+	<!-- 保存角色菜单 -->
+	<insert id="saveRoleMenuById" parameterType="map">
+		insert into sys_role_menu (
+			role_id,
+			menu_id,
+			create_user_id,
+			update_user_id,
+			create_date,
+			update_date
+		) values (
+			#{role_id},
+			#{menuId},
+			#{userId},
+			#{userId},
+			now(),
+			now()
+		)
+	</insert>
+	
+	<!-- 判断角色名称是否存在 -->
+	<select id="hasRoleName" parameterType="pd" resultMap="roleResultMap">
+		select id from sys_role
+		where is_delete = 1
+		and name = #{roleName}
+		<if test="id != null and id != 'undefined'">
+			and id != #{id}
+		</if>
+	</select>
+</mapper>

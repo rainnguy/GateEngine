@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="TransAccountMapper">
+	
+   		<resultMap type="TransAccount" id="TransAccounttheResultMap">
+       		<id property="id" column="id"/>
+	       	<result property="systrace" column="SYSTRACE"/>
+	       	<result property="acpName" column="ACQ_NAME"/>
+	       	<result property="mid" column="MID"/>
+	       	<result property="pan" column="PAN"/>
+	       	<result property="tid" column="TID"/>
+	       	<result property="txnAmt" column="TXN_AMT"/>
+	       	<result property="tranDate" column="TRAN_DATE"/>
+	       	<result property="txnName" column="TXN_NAME"/>
+	       	<result property="numerical" column="numerical"/>
+	       	<result property="merchantFee" column="merchant_fee"/>
+	       	<result property="amountOfSettlement" column="amount_of_settlement"/>
+	       	<!-- <result property="systraceB" column="sys_trace"/>
+	       	<result property="acpNameB" column="acp_name"/>
+	       	<result property="midB" column="mid"/>
+	       	<result property="panB" column="pan"/>
+	       	<result property="tidB" column="tid"/>
+	       	<result property="txnAmtB" column="txn_amt"/>
+	       	<result property="tranDateB" column="tranDate"/>
+	       	<result property="tranStatusB" column="TRAN_STATUS"/> -->
+	       
+   		</resultMap>
+	   
+	   	<!-- 查询交易信息列表 -->
+   		<select id="transAccountlistPage" parameterType="pd" resultMap="TransAccounttheResultMap">
+      		SELECT 
+		      		T.ACQ_NAME,
+			      	T.MID,
+			      	T.PAN,
+			      	T.TID,
+			      	T.TXN_AMT,
+			      	TN.TXN_NAME,
+			      	T.SYSTRACE,
+			      	to_char(T.TRAN_DATE,'yyyy-mm-dd hh24:mi:ss') as TRAN_DATE
+         	FROM 
+         			jsfr.TRANS T
+         		LEFT JOIN jsfr.TXN_NAME TN on T.TXN_ID = TN.TXN_ID
+         		<include refid="dynamic"/>
+         	UNION ALL
+         	SELECT 
+		      		'' AS ACQ_NAME,
+			      	MID,
+			      	PAN,
+			      	TID,
+			      	TXN_AMT,
+			      	TN.TXN_NAME,
+			      	SYSTRACE,
+			      	to_char(T.TRAN_DATE,'yyyy-mm-dd hh24:mi:ss') as TRAN_DATE
+         	FROM 
+         			jsfr.HIST_TRANS T
+         		LEFT JOIN jsfr.TXN_NAME TN on T.TXN_ID = TN.TXN_ID
+         		<include refid="dynamic"/>	
+   		</select>
+   		
+   		<select id="transAccountForExcel" parameterType="pd" resultMap="TransAccounttheResultMap">
+   			SELECT 
+		      		T.ACQ_NAME,
+			      	T.MID,
+			      	T.PAN,
+			      	T.TID,
+			      	T.TXN_AMT,
+			      	TN.TXN_NAME,
+			      	T.SYSTRACE,
+			      	to_char(T.TRAN_DATE,'yyyy-mm-dd hh24:mi:ss') as TRAN_DATE
+         	FROM 
+         			jsfr.TRANS T
+         		LEFT JOIN jsfr.TXN_NAME TN on T.TXN_ID = TN.TXN_ID
+         		<include refid="dynamic"/>
+         	UNION ALL
+         	SELECT 
+		      		'' AS ACQ_NAME,
+			      	MID,
+			      	PAN,
+			      	TID,
+			      	TXN_AMT,
+			      	TN.TXN_NAME,
+			      	SYSTRACE,
+			      	to_char(T.TRAN_DATE,'yyyy-mm-dd hh24:mi:ss') as TRAN_DATE
+         	FROM 
+         			jsfr.HIST_TRANS T
+         		LEFT JOIN jsfr.TXN_NAME TN on T.TXN_ID = TN.TXN_ID
+         		<include refid="dynamic"/>
+   		</select>
+   		
+   		<!-- 动态查询条件 -->
+   		<sql id="dynamic">
+   			<where>
+          		<!-- 用户可查询范围商户号 -->
+          		T.MID in (${pd.midStr}) 
+          		and T.TRAN_STATUS = 1 
+             	<if test="pd.mid!=null and pd.mid!=''">
+            		<!-- 商户号 -->
+                	AND T.MID = #{pd.mid}
+             	</if>
+             	<if test="pd.tid!=null and pd.tid!=''">
+            		<!-- 终端号 -->
+                	AND T.TID = #{pd.tid}
+             	</if>
+             	<if test="pd.txnId!=null and pd.txnId!='' and pd.txnId != 0">
+            		<!-- 交易类型 -->
+                	AND TN.TXN_ID = #{pd.txnId}
+             	</if>
+             	<if test="pd.pan!=null and pd.pan !=''">
+            		<!-- 卡号 -->
+                	<![CDATA[   and T.PAN = '${pd.pan}'  ]]>
+             	</if>
+             	<if test="pd.bankNo!=null and pd.bankNo!=''">
+            		<!-- 发卡行 -->
+                	and T.BANK_NO = LPAD (#{pd.bankNo} , 4 , '0')
+             	</if>
+             	<if test="pd.transStartDate != null and pd.transStartDate != '' ">
+            		<!-- 开始日期不为空 -->
+                	AND T.TRAN_DATE &gt;= to_date(#{pd.transStartDate},'yyyy-mm-dd hh24:mi:ss')
+             	</if>
+             	<if test="pd.transEndDate != null and pd.transEndDate != '' ">
+            		<!-- 结束日期不为空 -->
+                	AND T.TRAN_DATE &lt; to_date(#{pd.transEndDate},'yyyy-mm-dd hh24:mi:ss')+1
+             	</if>
+        	</where>
+   		</sql>
+   		
+   		<!-- 批量插入导入的文件数据到对账表 -->
+   		<insert id="batchInsertTransAccount" useGeneratedKeys="true" parameterType="java.util.List">
+   			 <selectKey resultType="long" keyProperty="id" order="AFTER">  
+		        SELECT  
+		        LAST_INSERT_ID()  
+		    </selectKey>  
+		     insert into bank_reconciliation(
+		     	sys_trace,
+		     	acp_name,
+		     	mid,
+		     	pan,
+		     	tid,
+		     	txn_amt,
+		     	trandate,
+		     	txn_name,
+		     	numerical,
+		     	merchant_fee,
+		     	amount_of_settlement
+		     )   
+    		values
+    		<foreach collection="list" item="item" index="index" separator="," >  
+		        (
+		        	#{item.systrace},
+		        	#{item.acpName},
+		        	#{item.mid},
+		        	#{item.pan},
+		        	#{item.tid},
+		        	#{item.txnAmt},
+		        	#{item.tranDate},
+		        	#{item.txnName},
+		        	#{item.numerical},
+		        	#{item.merchantFee},
+		        	#{item.amountOfSettlement}
+	        	)
+		    </foreach>
+   		</insert>
+	</mapper>

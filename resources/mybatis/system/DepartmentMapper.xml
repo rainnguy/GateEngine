@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DepartmentMapper">
+	
+	<resultMap type="Department" id="departmentResultMap">
+		<id property="id" column="id"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="departmentName" column="department_name"/>
+		<result property="departmentType" column="department_type"/>
+		<result property="departmentTypeName" column="department_type_name"/>
+		<result property="merchantNum" column="merchant_num"/>
+		<result property="merchantName" column="merchant_name"/>
+		<result property="concator" column="concator"/>
+		<result property="phone" column="phone"/>
+		<result property="address" column="address"/>
+		<result property="remark" column="remark"/>
+		<result property="province" column="province"/>
+		<result property="city" column="city"/>
+		<result property="area" column="area"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="createUser" column="create_user"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateUser" column="update_user"/>
+		<result property="updateDate" column="update_date"/>
+	</resultMap>
+	
+	<!-- 根据机构ID查询本机构及下级机构 -->
+	<select id="departmentslistPage" parameterType="pd" resultMap="departmentResultMap">
+		select 
+			sd.id,
+			sd.parent_id,
+			sd.department_name,
+			sd.department_type,
+			d.name as department_type_name,
+			sd.merchant_num,
+			sd.merchant_name,
+			sd.concator,
+			sd.phone,
+			concat(pr.region_name,ci.region_name,ar.region_name,sd.address) as address,
+			sd.is_delete,
+			sd.create_user,
+			sd.create_date,
+			sd.update_user,
+			sd.update_date
+		from sys_department sd
+		left join dictionary  d on sd.department_type = d.value
+		left join region pr on pr.region_id = sd.province
+		left join region ci on ci.region_id = sd.city
+    	left join region ar on ar.region_id = sd.area
+		where 
+			sd.is_delete = 1 
+			and d.is_delete = 1 
+			and d.type = 'departmentType'
+		<if test="pd.parentId != null">
+			and sd.parent_id = #{pd.parentId}
+		</if>	
+		<if test="pd.parentId == null">
+			and sd.id = #{pd.id}
+		</if>	
+		<if test="pd.keyValue != null and pd.keyValue != ''">
+			and 
+			(
+				sd.department_name LIKE CONCAT(CONCAT('%', #{pd.keyValue}),'%')
+			  or
+			    sd.merchant_num LIKE CONCAT(CONCAT('%', #{pd.keyValue}),'%')
+			  or
+			    sd.merchant_name LIKE CONCAT(CONCAT('%', #{pd.keyValue}),'%')
+			  or
+			    sd.concator LIKE CONCAT(CONCAT('%', #{pd.keyValue}),'%')
+			 )
+		</if>
+		order by id desc
+	</select>
+	
+	<!-- 查询列表顶部导航 -->
+	<select id="queryListDepForNavigation" parameterType="map" resultMap="departmentResultMap">
+		select id,parent_id,department_name from sys_department where id=#{id};
+	</select>
+	
+	<!-- 判断机构是否存在 -->
+	<select id="hasDepartment" parameterType="pd" resultMap="departmentResultMap">
+		select id from sys_department
+		where is_delete = 1
+		<if test="key != null and key != ''">
+			and ${key} = #{keyValue}
+		</if>
+		<if test="id != null and id != ''">
+			and id != #{id}
+		</if>
+	</select>
+	
+	<!-- 根据ID查询机构信息 -->
+	<select id="findDepartmentById" parameterType="pd" resultMap="departmentResultMap" useCache="false">
+		select 
+			id,
+			parent_id,
+			department_name,
+			department_type,
+			merchant_num,
+			merchant_name,
+			concator,
+			phone,
+			province,
+			city,
+			area,
+			address,
+			remark,
+			is_delete,
+			create_user,
+			create_date,
+			update_user,
+			update_date
+		from sys_department
+		where
+			id = #{id}
+	</select>
+	
+	<!-- 根据ID查询旗下所有的机构 -->
+	<select id="findAllDepartmentById" parameterType="map" resultMap="departmentResultMap" useCache="false">
+		SELECT 
+				sd.id,
+				sd.parent_id,
+				sd.department_name,
+				sd.department_type
+		FROM 
+				sys_department sd
+			JOIN (SELECT getChildCompanyIdList(#{departmentId}) AS idList) L
+		WHERE
+				sd.is_delete=1
+			AND FIND_IN_SET(id,L.idList)
+		order by id desc;
+	</select>
+	
+	
+	<!-- 新增机构信息 -->
+	<insert id="insertDepartment" parameterType="pd" flushCache="false">
+		insert into sys_department (
+			parent_id,
+			department_name,
+			department_type,
+			merchant_num,
+			merchant_name,
+			concator,
+			phone,
+			province,
+			city,
+			area,
+			address,
+			remark,
+			create_user,
+			create_date
+		) values (
+			#{parentId},
+			#{departmentName},
+			#{departmentType},
+			#{merchantNum},
+			#{merchantName},
+			#{concator},
+			#{phone},
+			#{province},
+			#{city},
+			#{area},
+			#{address},
+			#{remark},
+			#{createUser},
+			now()
+		)
+	</insert>
+	
+	<!-- 编辑保存机构信息 -->
+	<update id="updateDepartment" parameterType="pd" flushCache="false">
+		update  
+			sys_department
+		set department_name = #{departmentName},
+			department_type = #{departmentType},
+			merchant_num = #{merchantNum},
+			merchant_name = #{merchantName},
+			concator = #{concator},
+			phone = #{phone},
+			province = #{province},
+			city = #{city},
+			area = #{area},
+			address = #{address},
+			remark = #{remark},
+			update_user = #{updateUser}
+		where 
+			id = #{id}
+	</update>
+	
+	<!-- 删除机构信息，或删除机构的下级机构信息 -->
+	<update id="deleteDepartmentByIdOrParentId" parameterType="pd" flushCache="false">
+		update sys_department
+		set is_delete = 2
+		where 
+		<if test="parentId != null and parentId != ''">
+			parent_id = #{parentId}
+		</if>
+		<if test="id != null and id != ''">
+			id = #{id}
+		</if>
+	</update>
+	
+	<!-- 删除加油站中的POS机信息 -->
+	<update id="deleteStationPos" parameterType="pd" flushCache="false">
+		update pos_machine
+		set is_delete = 2
+		where department_id = #{departmentId}
+	</update>
+	
+	<!-- 根据机构ID查询本机构及下级机构 -->
+	<select id="queryDepartmentListByParentId" parameterType="pd" resultMap="departmentResultMap">
+		select 
+			sd.id,
+			sd.parent_id,
+			sd.department_name,
+			sd.department_type,
+			d.name as department_type_name,
+			sd.merchant_num,
+			sd.merchant_name,
+			sd.concator,
+			sd.phone,
+			sd.address,
+			sd.is_delete,
+			sd.create_user,
+			sd.create_date,
+			sd.update_user,
+			sd.update_date
+		from sys_department sd
+		left join dictionary  d on sd.department_type = d.value
+		where 
+			sd.is_delete = 1 
+			and d.is_delete = 1 
+			and d.type = 'departmentType'
+			and sd.parent_id = #{parentId}
+		order by id desc
+	</select>
+	
+	<!-- 根据商户号取商户名称 -->
+	<select id="queryDepNameByMerchantNum" parameterType="String" resultType="String">
+		select department_name from sys_department where merchant_num = #{merchantNum} and is_delete = 1
+	</select>
+	
+	<!-- 根据机构名称或商户名称及当前登录用户所属机构id，获得商户号 -->
+	<select id="queryMerchantNumByDepNameOrMerchantName" parameterType="pd" resultMap="departmentResultMap">
+		select d.* from sys_department d join (select getChildCompanyIdList(#{userDepartmentId}) as idList)L
+		<if test="depId != null and depId != ''">
+			join (select getChildCompanyIdList(#{depId}) as depIdList) T
+		</if>
+		where d.is_delete = 1
+		<if test="depId != null and depId != ''">
+			and find_in_set(d.id,T.depIdList)
+		</if>
+		<if test="depName != null and depName != ''">
+			and d.department_name LIKE CONCAT(CONCAT('%', #{depName}),'%') 
+		</if>
+		<if test="acqName != null and acqName != ''">
+			and d.merchant_name LIKE CONCAT(CONCAT('%', #{acqName}),'%') 
+		</if>
+		and find_in_set(d.id,L.idList)
+	</select>
+</mapper>
