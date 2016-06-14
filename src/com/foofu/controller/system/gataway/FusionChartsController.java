@@ -31,7 +31,7 @@ public class FusionChartsController extends BaseController {
 	@Resource(name="fusionChartsService")
 	private FusionChartsService fusionChartsService;
 
-	
+	//adfasdasdf
 	/**
 	 * 查询周报表
 	 * @return
