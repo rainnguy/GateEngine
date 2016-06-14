@@ -10,35 +10,35 @@
     </settings>
 
 	<typeAliases>
-		<typeAlias type="com.foofu.entity.system.User" alias="User"/>
-		<typeAlias type="com.foofu.entity.system.Role" alias="Role"/>
-		<typeAlias type="com.foofu.entity.system.Menu" alias="Menu"/>
+		<typeAlias type="com.furen.entity.system.User" alias="User"/>
+		<typeAlias type="com.furen.entity.system.Role" alias="Role"/>
+		<typeAlias type="com.furen.entity.system.Menu" alias="Menu"/>
 		<!-- 交易管理 -->
-		<typeAlias type="com.foofu.entity.system.Trans" alias="Trans"/>
-		<typeAlias type="com.foofu.entity.system.TransStatistic" alias="TransStatistic"/>
-		<typeAlias type="com.foofu.entity.system.TransType" alias="TransType"/>
-		<typeAlias type="com.foofu.entity.system.BankReco" alias="BankReco"/>
-		<typeAlias type="com.foofu.entity.system.TransAccount" alias="TransAccount"/>
+		<typeAlias type="com.furen.entity.system.Trans" alias="Trans"/>
+		<typeAlias type="com.furen.entity.system.TransStatistic" alias="TransStatistic"/>
+		<typeAlias type="com.furen.entity.system.TransType" alias="TransType"/>
+		<typeAlias type="com.furen.entity.system.BankReco" alias="BankReco"/>
+		<typeAlias type="com.furen.entity.system.TransAccount" alias="TransAccount"/>
 		<!-- 机构管理 -->
-		<typeAlias type="com.foofu.entity.system.Department" alias="Department"/>
+		<typeAlias type="com.furen.entity.system.Department" alias="Department"/>
 		<!-- 数据字典 -->
-		<typeAlias type="com.foofu.entity.system.Dictionary" alias="Dictionary"/>
+		<typeAlias type="com.furen.entity.system.Dictionary" alias="Dictionary"/>
 		<!-- 日志 -->
-		<typeAlias type="com.foofu.entity.system.Log" alias="Log"/>
+		<typeAlias type="com.furen.entity.system.Log" alias="Log"/>
 		
-		<typeAlias type="com.foofu.util.PageData" alias="pd"/>
+		<typeAlias type="com.furen.util.PageData" alias="pd"/>
 		<!-- 分页 -->
-		<typeAlias type="com.foofu.entity.Page" alias="Page"/>
+		<typeAlias type="com.furen.entity.Page" alias="Page"/>
 		<!-- 省市区 -->
-		<typeAlias type="com.foofu.entity.system.Region" alias="Region"/>
+		<typeAlias type="com.furen.entity.system.Region" alias="Region"/>
 		<!-- POS机信息管理 -->
-		<typeAlias type="com.foofu.entity.system.POSMachine" alias="POSMachine"/>
+		<typeAlias type="com.furen.entity.system.POSMachine" alias="POSMachine"/>
 		<!-- 图形报表 -->
-		<typeAlias type="com.foofu.entity.system.FusionCharts" alias="FusionCharts"/>
+		<typeAlias type="com.furen.entity.system.FusionCharts" alias="FusionCharts"/>
 	</typeAliases>
 	
 	<plugins>
-		<plugin interceptor="com.foofu.plugin.PagePlugin">
+		<plugin interceptor="com.furen.plugin.PagePlugin">
 			<property name="dialect" value="mysql"/>
 			<property name="pageSqlId" value=".*listPage.*"/>
 		</plugin>
