@@ -39,7 +39,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="com.foofu">
+	<logger name="com.furen">
 		<level value="info" />
 	</logger>
 	
@@ -72,7 +72,7 @@
 	</logger>
 	
 	<!-- Ibatis Start -->
-	<appender name="IBatis" class="com.foofu.listener.FileAppender">
+	<appender name="IBatis" class="com.furen.listener.FileAppender">
 		<param name="File" value="C:/yrny_log/sqlsql" />
 		<param name="threshold" value="debug" />
         <param name="Encoding" value="UTF-8" />
