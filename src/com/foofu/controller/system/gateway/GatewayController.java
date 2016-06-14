@@ -1,4 +1,4 @@
-package com.foofu.controller.system.gatewayEngine;
+package com.foofu.controller.system.gateway;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
