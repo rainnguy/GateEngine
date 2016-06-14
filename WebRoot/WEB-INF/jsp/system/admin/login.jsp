@@ -203,15 +203,17 @@
 			}
 			if ($("#code").val() == "") {
 
-				$("#code").tips({
-					side : 1,
-					msg : '验证码不得为空',
-					bg : '#AE81FF',
-					time : 3
-				});
+// 				$("#code").tips({
+// 					side : 1,
+// 					msg : '验证码不得为空',
+// 					bg : '#AE81FF',
+// 					time : 3
+// 				});
 
-				$("#code").focus();
-				return false;
+// 				$("#code").focus();
+// 				return false;
+
+				return true;
 			}
 
 			$("#loginbox").tips({
