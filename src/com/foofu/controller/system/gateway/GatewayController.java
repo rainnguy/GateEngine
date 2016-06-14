@@ -34,7 +34,7 @@ public class GatewayController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		
 		mv.addObject("description", "加油券");
-		mv.setViewName("/system/gatewayEngine/payPage");
+		mv.setViewName("/system/gateway/payPage");
 		
 		return mv;
 	}

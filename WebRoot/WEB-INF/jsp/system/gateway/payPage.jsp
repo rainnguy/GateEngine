@@ -25,7 +25,7 @@
 
 <script type="text/javascript" src="static/js/chosen.jquery.min.js"></script><!-- 下拉框 -->
 <script type="text/javascript" src="static/js/bootbox.min.js"></script><!-- 确认窗口 -->
-<script type="text/javascript" src="<%=basePath%>/static/js/gatewayEngine/payPage.js"></script><!-- 支付页面处理js -->
+<script type="text/javascript" src="<%=basePath%>/static/js/gateway/payPage.js"></script><!-- 支付页面处理js -->
 <!-- 引入 -->
 <script type="text/javascript" src="static/js/jquery.tips.js"></script><!--提示框-->
 
