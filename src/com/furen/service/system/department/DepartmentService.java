@@ -22,6 +22,24 @@ public class DepartmentService{
 	private DaoSupport dao;
 	
 	/**
+	 * 获取所有机构名称和商户号
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Department> getAllMerchant() throws Exception  {
+		return (List<Department>) dao.findForList("DepartmentMapper.getAllMerchant", null);
+	}
+	
+	/**
+	 * 获取所有可使用的站点
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Department> getAllUseAbleStations(String merchantNum) throws Exception  {
+		return (List<Department>) dao.findForList("DepartmentMapper.getAllUseAbleStations", merchantNum);
+	}
+	
+	/**
 	 * 机构列表
 	 * @param pd
 	 * @return

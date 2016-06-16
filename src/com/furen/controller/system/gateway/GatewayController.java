@@ -1,16 +1,24 @@
 package com.furen.controller.system.gateway;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.csii.payment.client.core.MerchantSignVerify;
+import com.csii.payment.client.core.MerchantSignVerifyExt;
 import com.furen.controller.base.BaseController;
+import com.furen.entity.system.Department;
+import com.furen.service.system.department.DepartmentService;
+import com.furen.util.AppUtil;
+import com.furen.util.PageData;
 
 /**
  * 网关
@@ -22,6 +30,9 @@ import com.furen.controller.base.BaseController;
 @RequestMapping("/gateway/")
 public class GatewayController extends BaseController {
 
+	@Resource(name="departmentService")
+	private DepartmentService departmentService;
+	
 	/**
 	 * 购买页面
 	 * 
@@ -33,7 +44,9 @@ public class GatewayController extends BaseController {
 		
 		ModelAndView mv = this.getModelAndView();
 		
-		mv.addObject("description", "加油券");
+		// 获取可选择的站点
+		getStations(mv);
+		
 		mv.setViewName("/system/gateway/payPage");
 		
 		return mv;
@@ -57,30 +70,94 @@ public class GatewayController extends BaseController {
 	}
 	
 	/**
-	 * 调用支付接口
+	 * 获取可使用的站
 	 * 
 	 * @return
-	 * @throws UnsupportedEncodingException 
-	 * @throws NoSuchAlgorithmException 
+	 * @throws Exception
 	 */
 	@ResponseBody
-	@RequestMapping("pay")
-	@Transactional(readOnly=false)
-	public String pay() throws NoSuchAlgorithmException, UnsupportedEncodingException{
-		MerchantSignVerify.merchantSignData_ABA("Plain");
+	@RequestMapping("showUseAbleStations")
+	public Object showUseAbleStations() throws Exception {
 		
-		String plain;
-		String signature;
-		String transName;
-
-		transName="IPER";
-		plain="TranAbbr=IPER|MasterID=|MercDtTm=20150803153700|TermSsn=000000000018|OSttDate=|OAcqSsn=|MercCode=983708160001601|TermCode=|TranAmt=12.05|Remark1=|Remark2=|MercUrl=https%3A%2F%2F112.4.3.50%3A443%2Fpayment%2FpaymentSpdbNotify%2Fv1|Ip=|SubMercFlag=0|SubMercName=system_api_provider|SubMercGoodsName=%BA%AE%B1%F9%B1%A6%BD%A3|PayFlag=";
-		signature="38f817f0fefca694050c14806004865ed6fbe0b53de6fdecb4eb73590c9c6e8b378321be2c283d6a45c1bba02409616d2f2316298ec1cc5e60c6640f4fd82bb6a3e59c73953f24a1e862fa187d4e86e2ef0f2178f6a93a6099fc0b735d70d9174085e405f213ae34842d5c4abf3f023de27096b14f4a9f3104095a032789f735";
-
+		Map<String,String> map = new HashMap<String,String>();
+		String errInfo = "success";
+		String useAbleStations="";
+		// 获取可使用的站
+		List<Department> stationMap = new ArrayList<Department>();
+		PageData pd = new PageData();
 		
+		pd = this.getPageData();
+		String merchantNum = pd.getString("requestMethod");
 		
-		return null;
+		try{
+			stationMap = departmentService.getAllUseAbleStations(merchantNum);
+		} catch (Exception e) {
+			errInfo = "error";
+			logger.error(e.toString(), e);
+		}
+		
+		for(Department department : stationMap){
+			useAbleStations = useAbleStations + department.getDepartmentName().toString() + "\r\n";
+		}
+		// 商品描述
+		map.put("useAbleStations", useAbleStations);
+		map.put("errInfo", errInfo);
+		
+		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**
+	 * 数据签名
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("signData")
+	public Object signData() {
+		
+		Map<String,String> map = new HashMap<String,String>();
+		PageData pd = new PageData();
+		
+		pd = this.getPageData();
+		String plain = pd.getString("plain");
+		String merchantNum = pd.getString("merchantNum");
+		// TODO 商户号目前是假的
+//		MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_"+merchantNum,
+//				"key_password_"+merchantNum, plain);
+		String signature = MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_983708160009501",
+				"key_password_983708160009501", plain);
+		
+		map.put("signature", signature);
+		
+		return AppUtil.returnObject(new PageData(), map);
 		
 	}
 	
+	/**
+	 * 获取可选择的站点
+	 * 
+	 * @param mv
+	 */
+	private void getStations(ModelAndView mv){
+		
+		Map<String, String> orgCodeMap = new LinkedHashMap<String, String>();
+		// 设置默认的空值
+		orgCodeMap.put("", "选择站点");
+		// 获取所有的站点
+		List<Department> stationMap = new ArrayList<Department>();
+		
+		try{
+			stationMap = departmentService.getAllMerchant();
+		} catch (Exception e) {
+			logger.error(e.toString(),e);
+		}
+		
+		for(Department department : stationMap){
+			String orgName = department.getDepartmentName();
+			String orgNum =  department.getMerchantNum();
+			orgCodeMap.put(orgNum, orgName);
+		}
+		
+		mv.addObject("orgValue", orgCodeMap);
+	}
 }
