@@ -25,6 +25,52 @@
 		<result property="updateDate" column="update_date"/>
 	</resultMap>
 	
+	<!-- 获取所有机构名称和商户号 -->
+	<select id="getAllMerchant" resultMap="departmentResultMap">
+		select
+			sd.id,
+			sd.department_name,
+			sd.merchant_num
+		from
+			sys_department sd
+		where
+			sd.is_delete = '1'
+			and sd.parent_id = (
+				select id
+				from sys_department
+				where department_type = '0'
+			)
+	</select>
+	
+	<!-- 根据机构的商户号获取所有关联的加油站 -->
+	<select id="getAllUseAbleStations" parameterType="String" resultMap="departmentResultMap">
+		select
+			sd.department_name
+		from
+			sys_department sd,
+			(select
+				id,
+				department_name,
+				department_type
+			from
+				sys_department
+			where
+				merchant_num = #{merchantNum}
+				and is_delete = '1'
+			) tp
+		where
+			((tp.department_type = '2'
+			and sd.parent_id = tp.id)
+			or (tp.department_type = '3'
+			and sd.merchant_num = #{merchantNum}
+			))
+			and sd.is_delete = '1'
+	</select>
+	
+	
+	<!-- //////////////////////////////////////////////////////////////////////////////// -->
+	
+	
 	<!-- 根据机构ID查询本机构及下级机构 -->
 	<select id="departmentslistPage" parameterType="pd" resultMap="departmentResultMap">
 		select 
