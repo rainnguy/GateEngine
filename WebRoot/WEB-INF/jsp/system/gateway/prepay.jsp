@@ -1,39 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-	String plain = request.getParameter("Plain");
-// 	String signature=com.csii.payment.client.core.MerchantSignVerifyExt.merchantSignData_ABA_EXT ("key_alias_983708160000201","key_password_983708160000201",plain);
-%>
 
-	<head>
-	<base href="<%=basePath%>">
-	
-	
-	<!-- basic styles -->
-		<link rel="stylesheet" href="static/css/bootstrap.min.css"  />
-		<link rel="stylesheet" href="static/css/chosen.css" />
-		<link rel="stylesheet" href="static/css/system/ace.min.css" />
-	
-		<script type="text/javascript" src="static/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="static/js/fuelux.wizard.js"></script>
-		<script type="text/javascript" src="static/js/jquery.validate.min.js"></script>
-		<script type="text/javascript" src="static/js/bootbox.min.js"></script>
-		<script type="text/javascript" src="static/js/chosen.jquery.min.js"></script>
-		<script type="text/javascript" src="static/js/ace-elements.min.js"></script>
-		<script type="text/javascript" src="static/js/system/ace.min.js"></script>
+<head>
+	<%@include file="/common/common.jsp"%>
+	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/prepay.js"></script>
 </head>
-
-
 <body>
 	<div class="row-fluid">
 	<div class="span12">
 		<div class="widget-box">
 			<div class="widget-header widget-header-blue widget-header-flat wi1dget-header-large">
-				<h4 class="lighter">New Item Wizard</h4>
+				<h4 class="lighter">富仁移动支付</h4>
 				<div class="widget-toolbar">
 					<label>
 						<small class="green"><b>Validation</b></small>
@@ -284,135 +262,6 @@
 	</div>
 </div>
 		
-	<script type="text/javascript">
-		$(top.hangge());
-	
-		$(function() {
-			$('[data-rel=tooltip]').tooltip();
-			$(".chzn-select").css('width','150px').chosen({allow_single_deselect:true , no_results_text: "No such state!"})
-			.on('change', function(){
-				$(this).closest('form').validate().element($(this));
-			}); 
-			var $validation = false;
-			$('#fuelux-wizard').ace_wizard().on('change' , function(e, info){
-				if(info.step == 1 && $validation) {
-					if(!$('#validation-form').valid()) return false;
-				}
-			}).on('finished', function(e) {
-				bootbox.dialog("Thank you! Your information was successfully saved!", [{
-					"label" : "OK",
-					"class" : "btn-small btn-primary",
-					}]
-				);
-		});
-	
-	
-		$('#validation-form').hide();
-		$('#skip-validation').removeAttr('checked').on('click', function(){
-			$validation = this.checked;
-			if(this.checked) {
-				$('#sample-form').hide();
-				$('#validation-form').show();
-			}
-			else {
-				$('#validation-form').hide();
-				$('#sample-form').show();
-			}
-		});
-	
-	//documentation : http://docs.jquery.com/Plugins/Validation/validate
-	
-		$.mask.definitions['~']='[+-]';
-		$('#phone').mask('(999) 999-9999');
-		jQuery.validator.addMethod("phone", function (value, element) {
-			return this.optional(element) || /^\(\d{3}\) \d{3}\-\d{4}( x\d{1,6})?$/.test(value);
-		}, "Enter a valid phone number.");
-		
-		$('#validation-form').validate({
-				errorElement: 'span',
-				errorClass: 'help-inline',
-				focusInvalid: false,
-				rules: {
-					email: {
-						required: true,
-						email:true
-					},
-					password: {
-						required: true,
-						minlength: 5
-					},
-					password2: {
-						required: true,
-						minlength: 5,
-						equalTo: "#password"
-					},
-					name: {
-						required: true
-					},
-					phone: {
-						required: true,
-						phone: 'required'
-					},
-					url: {
-						required: true,
-						url: true
-					},
-					comment: {
-						required: true
-					},
-					state: {
-						required: true
-					},
-					platform: {
-						required: true
-					},
-					subscription: {
-						required: true
-					},
-					gender: 'required',
-					agree: 'required'
-				},
-				messages: {
-					email: {
-						required: "Please provide a valid email.",
-						email: "Please provide a valid email."
-					},
-					password: {
-						required: "Please specify a password.",
-						minlength: "Please specify a secure password."
-					},
-					subscription: "Please choose at least one option",
-					gender: "Please choose gender",
-					agree: "Please accept our policy"
-				},
-				invalidHandler: function (event, validator) { //display error alert on form submit   
-					$('.alert-error', $('.login-form')).show();
-				},
-				highlight: function (e) {
-					$(e).closest('.control-group').removeClass('info').addClass('error');
-				},
-				success: function (e) {
-					$(e).closest('.control-group').removeClass('error').addClass('info');
-					$(e).remove();
-				},
-				errorPlacement: function (error, element) {
-					if(element.is(':checkbox') || element.is(':radio')) {
-						var controls = element.closest('.controls');
-						if(controls.find(':checkbox,:radio').length > 1) controls.append(error);
-						else error.insertAfter(element.nextAll('.lbl').eq(0));
-					} 
-					else if(element.is('.chzn-select')) {
-						error.insertAfter(element.nextAll('[class*="chzn-container"]').eq(0));
-					}
-					else error.insertAfter(element);
-				},
-				submitHandler: function (form) {
-				},
-				invalidHandler: function (form) {
-				}
-			});
-		})
-	</script>
 </body>
 </html>
 

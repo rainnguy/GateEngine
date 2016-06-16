@@ -8,7 +8,7 @@ $(function() {
 
 //保存缩放菜单状态
 function menusf(){
-	if(document.getElementsByName('menusf')[0].checked){
+	if(document.getElementsByName('menusf')[0]){
 		$.cookie('menusf', '', { expires: -1 });
 		$("#sidebar").attr("class","menu-min");
 	}else{

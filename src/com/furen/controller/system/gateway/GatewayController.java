@@ -40,6 +40,23 @@ public class GatewayController extends BaseController {
 	}
 	
 	/**
+	 * shopping test page
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("prepay")
+	public ModelAndView prepay() throws Exception {
+		
+		ModelAndView mv = this.getModelAndView();
+		
+		mv.addObject("description", "pay test");
+		mv.setViewName("/system/gateway/prepay");
+		
+		return mv;
+	}
+	
+	/**
 	 * 调用支付接口
 	 * 
 	 * @return
