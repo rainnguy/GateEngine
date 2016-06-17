@@ -73,7 +73,7 @@
 	
 	<!-- Ibatis Start -->
 	<appender name="IBatis" class="com.furen.listener.FileAppender">
-		<param name="File" value="C:/yrny_log/sqlsql" />
+		<param name="File" value="D:/yrny_log/sqlsql" />
 		<param name="threshold" value="debug" />
         <param name="Encoding" value="UTF-8" />
 		<param name="Append" value="true" />
