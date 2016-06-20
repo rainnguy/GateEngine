@@ -1,23 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
+<%
+	String goodsName = java.net.URLEncoder.encode("加油券","GBK");
+%>
+<html>
 <head>
 	<%@include file="/common/common.jsp"%>
-	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/prepay.js"></script>
+	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/payPage.js"></script>
 </head>
+
 <body>
 	<div class="row-fluid">
 	<div class="span12">
 		<div class="widget-box">
 			<div class="widget-header widget-header-blue widget-header-flat wi1dget-header-large">
 				<h4 class="lighter">富仁移动支付</h4>
-				<div class="widget-toolbar">
-					<label>
-						<small class="green"><b>Validation</b></small>
-						<input id="skip-validation" type="checkbox" class="ace-switch ace-switch-4" /><span class="lbl"></span>
-					</label>
-				</div>
 			</div>
 			<div class="widget-body">
 			 <div class="widget-main">
@@ -25,10 +23,10 @@
 				<div class="row-fluid">
 					<div id="fuelux-wizard" class="row-fluid hidden">
 					  <ul class="wizard-steps">
-						<li data-target="#step1" class="active"><span class="step">1</span> <span class="title">Validation states</span></li>
-						<li data-target="#step2"><span class="step">2</span> <span class="title">Alerts</span></li>
-						<li data-target="#step3"><span class="step">3</span> <span class="title">Payment Info</span></li>
-						<li data-target="#step4"><span class="step">4</span> <span class="title">Other Info</span></li>
+						<li data-target="#step1" class="active"><span class="step">1</span> <span class="title">选择站点</span></li>
+						<li data-target="#step2"><span class="step">2</span> <span class="title">选择商品</span></li>
+						<li data-target="#step3"><span class="step">3</span> <span class="title">选择支付方式</span></li>
+						<li data-target="#step4"><span class="step">4</span> <span class="title">确认支付</span></li>
 					  </ul>
 					</div>
 					
@@ -36,215 +34,230 @@
 					
 					<div class="step-content row-fluid position-relative">
 						<div class="step-pane active" id="step1">
-							<h3 class="lighter block green">Enter the following information</h3>
+							<h3 class="lighter block green">站点信息</h3>
 							
-							<form class="form-horizontal" id="sample-form">
-								<div class="control-group warning">
-									<label class="control-label" for="inputWarning">Input with warning</label>
-									<div class="controls">
-										<span class="span6 input-icon input-icon-right">
-											<input class="span12" type="text" id="inputWarning" />
-											<i class="icon-warning-sign"></i>
-										</span>
-										<span class="help-inline">Something may have gone wrong</span>
-									</div>
-								</div>
-								<div class="control-group error">
-									<label class="control-label" for="inputError">Error with tooltip</label>
-									<div class="controls">
-										<span class="span6 input-icon input-icon-right">
-											<input class="tooltip-error span12" type="text" id="inputError" data-rel="tooltip" title="Error info!" data-trigger="focus" />
-											<i class="icon-remove-sign"></i>
-										</span>
-										<span class="help-inline">Please correct the error</span>
-									</div>
-								</div>
-								<div class="control-group success">
-									<label class="control-label" for="inputSuccess">Input with success</label>
-									<div class="controls">
-										<span class="span6 input-icon input-icon-right">
-											<input class="span12" type="text" id="inputSuccess" />
-											<i class="icon-ok-sign"></i>
-										</span>	
-										<span class="help-inline">Woohoo!</span>
-									</div>
-								</div>
-								<div class="control-group info">
-									<label class="control-label" for="inputInfo">Blue Input with Info</label>
-									<div class="controls">
-										<span class="span6 input-icon input-icon-right">
-											<input class="span12" type="text" id="inputInfo" />
-											<i class="icon-info-sign"></i>
-										</span>	
-										<span class="help-inline">Info tip help!</span>
-									</div>
-								</div>
-							</form>
-							
-							
-							
-							<form class="form-horizontal" id="validation-form" method="get">
-							  
+							<div class="form-horizontal">
 								<div class="control-group">
-									<label class="control-label" for="email">Email Address:</label>
-									<div class="controls">
-										<div class="span12">
-											<input type="email" name="email" id="email" class="span6" />
-										</div>
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="password">Password:</label>
-									<div class="controls">
-										<div class="span12">
-											<input type="password" name="password" id="password" class="span4" />
-										</div>
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="password2">Confirm Password:</label>
-									<div class="controls">
-										<div class="span12">
-											<input type="password" name="password2" id="password2" class="span4" />
-										</div>
-									</div>
-								</div>
-								
-								<div class="hr hr-dotted"></div>
-								
-								<div class="control-group">
-									<label class="control-label" for="name">Company Name:</label>
+									<label class="control-label" for="station">选择站点</label>
 									<div class="controls">
 										<span class="span12">
-											<input class="span6" type="text" id="name" name="name" />
-										</span>
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="phone">Phone Number:</label>
-									<div class="controls">
-										<div class="span3 input-prepend">
-											<span class="add-on"><i class="icon-phone"></i></span>
-											<input class="span12" type="tel" id="phone" name="phone" />
-										</div>
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="url">Company URL:</label>
-									<div class="controls">
-										<div class="span12">
-											<input type="url" id="url" name="url" class="span8" />
-										</div>
-									</div>
-								</div>
-								
-								<div class="hr hr-dotted"></div>
-								
-								<div class="control-group">
-									<label class="control-label">Subscribe to</label>
-									<div class="controls">
-										<span class="span12">
-											<label><input name="subscription" value="1" type="checkbox" /><span class="lbl"> Latest news and announcements</span></label>
-											<label><input name="subscription" value="2" type="checkbox" /><span class="lbl"> Product offers and discounts</span></label>
-										</span>
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label">Gender</label>
-									<div class="controls">
-										<span class="span12">
-											<label class="blue"><input name="gender" value="1" type="radio" /><span class="lbl"> Male</span></label>
-											<label class="blue"><input name="gender" value="2" type="radio" /><span class="lbl"> Female</span></label>
-										</span>
-									</div>
-								</div>
-								
-								<div class="hr hr-dotted"></div>
-								
-								<div class="control-group">
-									<label class="control-label" for="state">State</label>
-									<div class="controls">
-										<span class="span12">
-											<select id="state" name="state" class="chzn-select" data-placeholder="Click to Choose...">
-												<option value=""></option>
-												<option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+											<select class="span3" id="station" name="station" onchange="showUseAbleStations()">
+												<c:forEach items="${orgValue}" var="map">
+													<option value="${map.key}">${map.value}</option>
+												</c:forEach>
 											</select>
+											<input type="hidden" id="merchantNum" value="" />
+											<input type="hidden" id="merchantName" value="" />
 										</span>
 									</div>
+									<span class="help-inline" id="stationHelp"></span>
 								</div>
 								
 								<div class="control-group">
-									<label class="control-label" for="platform">Platform</label>
+									<label class="control-label">可使用站点</label>
 									<div class="controls">
 										<span class="span12">
-											<select class="span3" id="platform" name="platform">
-												<option value="">------------------</option>
-												<option value="linux">Linux</option>
-												<option value="windows">Windows</option>
-												<option value="mac">Mac OS</option>
-												<option value="ios">iOS</option>
-												<option value="android">Android</option>
-											</select>
+											<textarea class="span8" id="useAbleStations" style="width: 450px; height: 260px; color: #0000FF; resize: none" readonly="readonly" ></textarea>
 										</span>
 									</div>
 								</div>
-								
-								<div class="control-group">
-									<label class="control-label" for="comment">Comment</label>
-									<div class="controls">
-										<span class="span12">
-											<textarea class="span8" name="comment" id="comment"></textarea>
-										</span>
-									</div>
-								</div>
-								
-								<div class="control-group">
-									<div class="controls">
-										<span class="span6">
-											<label><input name="agree" id="agree" type="checkbox" /><span class="lbl"> I accept the policy</span></label>
-										</span>
-									</div>
-								</div>
-							  </form>
-							
-							
-							
+							</div>
 						</div>
 						
 						<div class="step-pane" id="step2">
-							<div class="row-fluid">
-								<div class="alert alert-success">
-									<button type="button" class="close" data-dismiss="alert"><i class="icon-remove"></i></button>
-									<strong><i class="icon-ok"></i> Well done!</strong>
-									You successfully read this important alert message. <br />
+							<h3 class="lighter block green">商品信息</h3>
+							
+							<div class="form-horizontal">
+								<div class="control-group">
+									<label class="control-label">名称</label>
+									<div class="controls">
+										<span class="span6 input-icon input-icon-right">
+											<input type="text" class="span3" id="description" value="加油券" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+											<input type="hidden" id="goodsName" value="<%=goodsName%>" />
+										</span>
+									</div>
 								</div>
-								<div class="alert alert-error">
-									<button type="button" class="close" data-dismiss="alert"><i class="icon-remove"></i></button>
-									<strong><i class="icon-remove"></i> Oh snap!</strong>
-									Change a few things up and try submitting again. <br />
+								
+								<div class="control-group">
+									<label class="control-label" for="money">面值</label>
+									<div class="controls">
+										<span class="span12">
+											<select class="span2" id="money" name="money" onchange="showValue()">
+												<option value="50">50</option>
+												<option value="100">100</option>
+												<option value="150">150</option>
+												<option value="200" selected>200</option>
+												<option value="300">300</option>
+												<option value="500">500</option>
+												<option value="1000">1000</option>
+											</select>
+										</span>
+									</div>
 								</div>
-								<div class="alert alert-warning">
-									<button type="button" class="close" data-dismiss="alert"><i class="icon-remove"></i></button>
-									<strong>Warning!</strong>
-									Best check yo self, you're not looking too good. <br />
+								
+								<div class="control-group">
+									<label class="control-label">价格</label>
+									<div class="controls">
+										<span class="span6 input-icon input-icon-right">
+											<input type="hidden" name="discount" id="discount" value="0.99" />
+											<input type="text" class="span3" id="realPrice" style="color: #0000FF; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" value="198" readonly="readonly" />
+										</span>
+									</div>
 								</div>
-								<div class="alert alert-info">
-									<button type="button" class="close" data-dismiss="alert"><i class="icon-remove"></i></button>
-									<strong>Heads up!</strong>
-									This alert needs your attention, but it's not super important. <br />
+								
+								<div class="control-group">
+									<label class="control-label">数量</label>
+									<div class="controls">
+										<span class="span6 input-icon input-icon-right">
+											<input class="span3" type="text" name="number" id="number" value="1" 
+												style="color: #0000FF; ime-mode:Disabled" onchange="changeNumber()" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+											<span class="help-inline" id="numberHelp" style="color: #FF0000"></span>
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
 						
 						<div class="step-pane" id="step3">
-							<div class="center">
-								<h3 class="blue lighter">This is step 3</h3>
+							<h3 class="lighter block green">支付信息</h3>
+							
+							<div class="form-horizontal">
+								<div class="control-group">
+									<label class="control-label">支付方式</label>
+									<div class="controls">
+										<span class="span12">
+											<label class="blue"><input id="payType" name="payType" value="0" type="radio" onclick="changePayType()"/><span class="lbl"> 手机快捷支付</span></label>
+											<label class="blue"><input id="payType" name="payType" value="1" type="radio" onclick="changePayType()" checked /><span class="lbl"> 网银支付</span></label>
+										</span>
+									</div>
+								</div>
+								
+								<div class="control-group">
+									<label class="control-label">卡种</label>
+									<div class="controls">
+										<span class="span12">
+											<label class="blue"><input id="cardType" name="cardType" value="0" type="radio" onclick="changeCardType()" checked /><span class="lbl"> 借记卡</span></label>
+											<label class="blue"><input id="cardType" name="cardType" value="1" type="radio" onclick="changeCardType()"/><span class="lbl"> 信用卡</span></label>
+										</span>
+									</div>
+								</div>
+								
+								<div class="control-group">	
+									<label class="control-label" for="bank">支付银行</label>
+									<div class="controls">
+										<span class="span12">
+											<select class="span3" id="bank" name="bank" onchange="changeBank()">
+												<option value="" selected>选择银行</option>
+												<option value="vbank">虚拟银行</option>
+												<option value="cmb">招商银行</option>
+												<option value="icbc">中国工商银行</option>
+												<option value="ccb">中国建设银行</option>
+												<option value="abc">中国农业银行</option>
+												<option value="cmbc">中国民生银行</option>
+												<option value="spdb">上海浦东发展银行</option>
+												<option value="cgb">广东发展银行</option>
+												<option value="cib">兴业银行</option>
+												<option value="ceb">光大银行</option>
+												<option value="comm">交通银行</option>
+												<option value="boc">中国银行</option>
+												<option value="citic">中信银行</option>
+												<option value="bos">上海银行</option>
+												<option value="pingan">平安银行</option>
+												<option value="psbc">邮政储蓄</option>
+											</select>
+										</span>
+										<span class="help-inline" id="bankHelp" style="color: #FF0000"></span>
+									</div>
+									<input type="hidden" id="bankValue" value="" />
+								</div>
 							</div>
 						</div>
+						
 						<div class="step-pane" id="step4">
-							<div class="center">
-								<h3 class="green">Congrats!</h3>
-								Your product is ready to ship! Click finish to continue!
+							<h3 class="lighter block green">确认支付</h3>
+							
+							<div class="form-horizontal">
+								<div class="control-group">
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">站点：</label>
+											<input type="text" class="span8" id="confirmStation" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+										</span>
+									</div>
+<!-- 									<label id="confirmStation"></label> -->
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">商品：</label>
+											<input type="text" class="span8" id="confirmDescription" value="加油券" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">面值：</label>
+											<input type="text" class="span8" id="confirmMoney" value="200 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmMoney">200 元</label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">价格：</label>
+											<input type="text" class="span8" id="confirmPrice" value="198 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmPrice">198 元</label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">数量：</label>
+											<input type="text" class="span8" id="confirmNumber" value="1" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmNumber">1</label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">总金额：</label>
+											<input type="text" class="span8" id="confirmAmount" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmAmount"></label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">支付方式：</label>
+											<input type="text" class="span8" id="confirmPayType" value="网银支付" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmPayType">网银支付</label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">支付银行：</label>
+											<input type="text" class="span8" id="confirmPayBank" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmPayBank"></label> -->
+										</span>
+									</div>
+									
+									<div class="controls">
+										<span class="span12 input-icon input-icon-right">
+											<label class="control-label">卡种：</label>
+											<input type="text" class="span8" id="confirmPayCardType" value="借记卡" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+<!-- 											<label id="confirmPayCardType">借记卡</label> -->
+										</span>
+									</div>
+								</div>
+							</div>
+							
+							<div class="control-group">
+								<form action="http://124.74.239.32/payment/main" id="payform" method="post">
+									<input type="hidden" name="transName" id="transName" value="" />
+									<input type="hidden" name="Plain" id="plain" value="" />
+									<input type="hidden" name="Signature" id="signature" value="" />
+									<input type="submit" id="submit" name="submit" class="orgBtnlong"
+										value="支付" disabled="disabled" onclick="saveOrder()"/>
+								</form>
 							</div>
 						</div>
 					</div>
@@ -252,8 +265,8 @@
 					<hr />
 					
 					<div class="row-fluid wizard-actions">
-						<button class="btn btn-prev"><i class="icon-arrow-left"></i> Prev</button>
-						<button class="btn btn-success btn-next" data-last="Finish ">Next <i class="icon-arrow-right icon-on-right"></i></button>
+						<button class="btn btn-prev" id="before"><i class="icon-arrow-left"></i> 上一步</button>
+						<button class="btn btn-success btn-next" id="after" data-last="支付 " disabled="disabled">下一步 <i class="icon-arrow-right icon-on-right"></i></button>
 					</div>
 				</div>
 			 </div><!--/widget-main-->
@@ -264,4 +277,3 @@
 		
 </body>
 </html>
-

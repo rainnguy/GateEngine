@@ -1,7 +1,3 @@
-var payFlg = "1";
-// 支付银行
-var bankValue = "";
-
 var locat = (window.location + '').split('/');
 $(function() {
 	if ('tool' == locat[3]) {
@@ -12,21 +8,182 @@ $(function() {
 	;
 });
 
+$(top.hangge());
+
+$(function() {
+	$('[data-rel=tooltip]').tooltip();
+	$(".chzn-select").css('width','150px').chosen({allow_single_deselect:true , no_results_text: "No such state!"})
+	.on('change', function(){
+		$(this).closest('form').validate().element($(this));
+	});
+	$('#fuelux-wizard').ace_wizard().on('change' , function(e, info){
+		var step = info.step;
+		if (document.getElementById("stationHelp").innerText != "" ||
+				(document.getElementById("numberHelp").innerText != "" && step == 1) ||
+				(document.getElementById("bankHelp").innerText != "" && step == 2)) {
+			document.getElementById("after").disabled = "disabled";
+		} else {
+			document.getElementById("after").disabled = "";
+		}
+		
+		if(document.getElementById("submit").disabled == "") {
+			// 确认并组装数据
+			checkCustomerOder();
+			
+			// 调用后台，对数据进行签名
+			signDatatt();
+		}
+	}).on('finished', function(e) {
+		
+		// 把订单信息保存到数据库
+		saveOrder();
+		
+		// 调用网关进行支付
+		document.getElementById("payform").submit();
+		
+		bootbox.dialog("支付完成！", [{
+			"label" : "OK",
+			"class" : "btn-small btn-primary",
+			}]
+		);
+	});
+
+	$('#validation-form').hide();
+	$('#skip-validation').removeAttr('checked').on('click', function(){
+		$validation = this.checked;
+		if(this.checked) {
+			$('#sample-form').hide();
+			$('#validation-form').show();
+		}
+		else {
+			$('#validation-form').hide();
+			$('#sample-form').show();
+		}
+	});
+
+	$.mask.definitions['~']='[+-]';
+	$('#phone').mask('(999) 999-9999');
+	jQuery.validator.addMethod("phone", function (value, element) {
+		return this.optional(element) || /^\(\d{3}\) \d{3}\-\d{4}( x\d{1,6})?$/.test(value);
+	}, "Enter a valid phone number.");
+
+	$('#validation-form').validate({
+		errorElement: 'span',
+		errorClass: 'help-inline',
+		focusInvalid: false,
+		rules: {
+			email: {
+				required: true,
+				email:true
+			},
+			password: {
+				required: true,
+				minlength: 5
+			},
+			password2: {
+				required: true,
+				minlength: 5,
+				equalTo: "#password"
+			},
+			name: {
+				required: true
+			},
+			phone: {
+				required: true,
+				phone: 'required'
+			},
+			url: {
+				required: true,
+				url: true
+			},
+			comment: {
+				required: true
+			},
+			state: {
+				required: true
+			},
+			platform: {
+				required: true
+			},
+			subscription: {
+				required: true
+			},
+			gender: 'required',
+			agree: 'required'
+		},
+		messages: {
+			email: {
+				required: "Please provide a valid email.",
+				email: "Please provide a valid email."
+			},
+			password: {
+				required: "Please specify a password.",
+				minlength: "Please specify a secure password."
+			},
+			subscription: "Please choose at least one option",
+			gender: "Please choose gender",
+			agree: "Please accept our policy"
+		},
+		invalidHandler: function (event, validator) { //display error alert on form submit   
+			$('.alert-error', $('.login-form')).show();
+		},
+		highlight: function (e) {
+			$(e).closest('.control-group').removeClass('info').addClass('error');
+		},
+		success: function (e) {
+			$(e).closest('.control-group').removeClass('error').addClass('info');
+			$(e).remove();
+		},
+		errorPlacement: function (error, element) {
+			if(element.is(':checkbox') || element.is(':radio')) {
+				var controls = element.closest('.controls');
+				if(controls.find(':checkbox,:radio').length > 1) controls.append(error);
+				else error.insertAfter(element.nextAll('.lbl').eq(0));
+			} 
+			else if(element.is('.chzn-select')) {
+				error.insertAfter(element.nextAll('[class*="chzn-container"]').eq(0));
+			}
+			else error.insertAfter(element);
+		},
+		submitHandler: function (form) {
+		},
+		invalidHandler: function (form) {
+		}
+	});
+});
+
 // 支付方式变更
 function changePayType() {
-	for (var i = 0; i < payType.length; i++) {
-		if (payType.options[i].selected == true) {
-			switch (payType.options[i].value) {
-			case "0":
-				payFlg = "0";
-				break;
-			case "1":
-				payFlg = "1";
-				break;
-			}
-			break;
-		}
+	var payType = document.getElementById("payType").value;
+	if (payType == "0") {
+		document.getElementById("confirmPayType").value = "手机快捷支付";
+	} else if (payType == "1") {
+		document.getElementById("confirmPayType").value = "网银支付";
+	} else {
+		document.getElementById("confirmPayType").value = "";
 	}
+	document.getElementById("submit").disabled = "disabled";
+	document.getElementById("bank").value = "";
+	document.getElementById("bankValue").value = "";
+	document.getElementById("transName").value = "";
+	document.getElementById("plain").value = "";
+}
+
+// 银行卡类型变更
+function changeCardType() {
+	var cardType = document.getElementById("cardType").value;
+	if (cardType == "0") {
+		document.getElementById("confirmPayCardType").value = "借记卡";
+	} else if (cardType == "1") {
+		document.getElementById("confirmPayCardType").value = "信用卡";
+	} else {
+		document.getElementById("confirmPayCardType").value = "";
+	}
+	document.getElementById("submit").disabled = "disabled";
+	document.getElementById("bank").value = "";
+	document.getElementById("bankValue").value = "";
+	document.getElementById("transName").value = "";
+	document.getElementById("plain").value = "";
 }
 
 // 选择银行变更
@@ -34,10 +191,18 @@ function changeBank() {
 	for (var i = 0; i < bank.length; i++) {
 		if (bank.options[i].selected == true) {
 			bankValue = bank.options[i].value;
+			bankName = bank.options[i].text;
+			document.getElementById("bankValue").value = bankValue;
 			if (bankValue != "") {
-				document.getElementById("submit").disabled="";
+				document.getElementById("confirmPayBank").value = bankName;
+				document.getElementById("bankHelp").innerText = "";
+				document.getElementById("submit").disabled = "";
+				document.getElementById("after").disabled = "";
 			} else {
-				document.getElementById("submit").disabled="disabled";
+				document.getElementById("confirmPayBank").value = "";
+				document.getElementById("bankHelp").innerText = "请选择支付银行！";
+				document.getElementById("submit").disabled = "disabled";
+				document.getElementById("after").disabled = "disabled";
 				document.getElementById("transName").value = "";
 				document.getElementById("plain").value = "";
 				return;
@@ -45,13 +210,7 @@ function changeBank() {
 			break;
 		}
 	}
-
-	// 确认并组装数据
-	checkCustomerOder();
-	
-	// 调用后台，对数据进行签名
-	signDatatt();
-};
+}
 
 
 //确认并组装数据
@@ -61,13 +220,13 @@ function checkCustomerOder() {
 	var number = document.getElementById("number").value;
 	
 	// 判断金额
-	if (document.getElementById("realMoney").innerText == "") {
+	if (document.getElementById("realPrice").value == "") {
 		flag = 1;
 		alert("请选择要购买的加油券的面值");
 	}
 	
 	// 判断数量
-	if (number == "") {
+	if (number == "" || number == "0") {
 		flag = 1;
 		alert("请输入要购买的数量");
 	}
@@ -79,7 +238,7 @@ function checkCustomerOder() {
 	}
 	
 	// 判断银行卡
-	if (bankValue == "") {
+	if (document.getElementById("bankValue").value == "") {
 		flag = 1;
 		alert("请选择支付的银行卡");
 	}
@@ -100,7 +259,7 @@ function signDatatt() {
 		url : locat + '/gateway/signData.do',
 		data : {
 			plain : $("#plain").val(),
-			merchantNum :  $("#merchantNum").val()
+			merchantNum : $("#merchantNum").val()
 		},
 		dataType : 'json',
 		cache : false,
@@ -112,46 +271,80 @@ function signDatatt() {
 
 // 显示实际金额
 function showValue() {
-	var discount = document.getElementById("discount").value;
-	
 	for (var i = 0; i < money.length; i++) {
 		if (money.options[i].selected == true) {
-			document.getElementById("realMoney").innerText = money.options[i].value * discount;
-			break;
-		}
-	}
-}
-
-// 选择站点后显示可使用的站点
-function showUseAbleStations() {
-	var merchantNum = "";
-
-	for (var i = 0; i < station.length; i++) {
-		if (station.options[i].selected == true) {
-			merchantNum = station.options[i].value;
-			document.getElementById("merchantNum").value = merchantNum;
-			document.getElementById("merchantName").value = station.options[i].text;
-			
-			if (merchantNum != "") {
-				document.getElementById("bank").disabled = "";
-			} else {
-				document.getElementById("bank").disabled = "disabled";
-			}
-			
+			var moneyTemp = money.options[i].value;
+			var discount = document.getElementById("discount").value;
+			var price = moneyTemp * discount;
+			document.getElementById("confirmMoney").value = moneyTemp + " 元";
+			document.getElementById("confirmPrice").value = price + " 元";
+			document.getElementById("realPrice").value = price;
 			document.getElementById("submit").disabled = "disabled";
 			document.getElementById("bank").value = "";
+			document.getElementById("bankValue").value = "";
 			document.getElementById("transName").value = "";
 			document.getElementById("plain").value = "";
 			break;
 		}
 	}
+}
 
+// 改变数量时，重新选择银行来计算应付金额
+function changeNumber(){
+	var number = document.getElementById("number").value;
+	if (number == "" || number == "0") {
+		document.getElementById("confirmNumber").value = "";
+		document.getElementById("numberHelp").innerText = "请输入要购买的数量！";
+		document.getElementById("after").disabled = "disabled";
+	} else {
+		document.getElementById("confirmNumber").value = number;
+		document.getElementById("numberHelp").innerText = "";
+		document.getElementById("after").disabled = "";
+	}
+	document.getElementById("submit").disabled = "disabled";
+	document.getElementById("bank").value = "";
+	document.getElementById("bankValue").value = "";
+	document.getElementById("transName").value = "";
+	document.getElementById("plain").value = "";
+}
+
+// 选择站点后显示可使用的站点
+function showUseAbleStations() {
+	
+	for (var i = 0; i < station.length; i++) {
+		if (station.options[i].selected == true) {
+			var merchantNum = "";
+			merchantNum = station.options[i].value;
+			merchantName = station.options[i].text;
+			document.getElementById("merchantNum").value = merchantNum;
+			document.getElementById("merchantName").value = merchantName;
+			if (merchantNum == "") {
+				document.getElementById("confirmStation").value = "";
+				document.getElementById("stationHelp").innerText = "请选择站点！";
+				document.getElementById("bank").disabled = "disabled";
+				document.getElementById("after").disabled = "disabled";
+			} else {
+				document.getElementById("confirmStation").value = merchantName;
+				document.getElementById("stationHelp").innerText = "";
+				document.getElementById("bank").disabled = "";
+				document.getElementById("after").disabled = "";
+			}
+			
+			document.getElementById("submit").disabled = "disabled";
+			document.getElementById("bank").value = "";
+			document.getElementById("bankValue").value = "";
+			document.getElementById("transName").value = "";
+			document.getElementById("plain").value = "";
+			break;
+		}
+	}
+	
 	// 调用后台去获取可使用的站
 	$.ajax({
 		type : "POST",
 		url : locat + '/gateway/showUseAbleStations.do',
 		data : {
-			requestMethod : merchantNum
+			merchantNum : $("#merchantNum").val()
 		},
 		dataType : 'json',
 		cache : false,
@@ -169,7 +362,7 @@ function showUseAbleStations() {
 function establishData() {
 	
 	// 交易金额
-	var realMoney = document.getElementById("realMoney").innerText
+	var realMoney = document.getElementById("realPrice").value
 			* document.getElementById("number").value;
 	
 	// 商户日期时间
@@ -184,22 +377,21 @@ function establishData() {
 	// 支付类型 1-商品购买,4-捐赠,47-电子卡券
 	var payType = 47;
 	// 商品名称
-	// var goodsName = document.getElementById("description").innerText;
+	// var goodsName = document.getElementById("description").value;
 	var goodsName = document.getElementById("goodsName").value;
 	// 商户名称
-//	var merchantName = document.getElementById("merName").value;
-	var merchantName = "aaaa";
+	//	var merchantName = document.getElementById("merchantName").value;
+	var merchantName = "";
 	
 	// 支付交易中，接收交易结果的url
-	// var mercUrl =
-	// "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2Fmain%2Findex";
-	var mercUrl = "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2F404.jsp";
-//	http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2Fmain%2Findex
+//	var mercUrl = "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2F404.jsp";
+	var mercUrl = "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2Fgateway%2FpayPage.do";
 
-	
 	//交易缩写
 	var transName = "";
 	var plain = "";
+	
+	bankValue = document.getElementById("bankValue").value;
 	
 	if (bankValue == "spdb") {
 		transName = "IPER";
@@ -208,7 +400,6 @@ function establishData() {
 		+ mercCode + "|TermCode=|TranAmt=" + realMoney + "|Remark1=|Remark2=|MercUrl="
 		+ mercUrl + "|Ip=|SubMercFlag=0|SubMercName=" + merchantName
 		+ "|SubMercGoodsName=" + goodsName;
-		alert(plain);
 	} else {
 		transName = "KHZF";
 		plain = "TranAbbr=" + transName + "|MasterID=|MercDtTm=" + nowDateTime
@@ -221,6 +412,32 @@ function establishData() {
 
 	document.getElementById("transName").value = transName;
 	document.getElementById("plain").value = plain;
+	
+	// 总金额
+	document.getElementById("confirmAmount").value = realMoney + " 元";
+}
+
+// 把订单信息保存到数据库 TODO
+function saveOrder() {
+	$.ajax({
+		type : "POST",
+		url : locat + '/gateway/saveOrderInfo.do',
+		data : {
+			merchantNum : document.getElementById("merchantNum").value,
+			price : document.getElementById("realPrice").value,
+			number : document.getElementById("number").value,
+			payType : document.getElementById("payTypeHidden").value,
+			payBank : document.getElementById("bankValue").value,
+			cardType : document.getElementById("cardTypeHidden").value
+		},
+		dataType : 'json',
+		cache : false,
+		success : function(data) {
+			if ("success" != data.errInfo) {
+				alert("保存订单信息异常！");
+			}
+		}
+	});
 }
 
 // 获取日期、时间
