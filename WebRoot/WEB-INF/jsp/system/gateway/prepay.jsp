@@ -34,7 +34,7 @@
 					
 					<div class="step-content row-fluid position-relative">
 						<div class="step-pane active" id="step1">
-							<h3 class="lighter block green">站点信息</h3>
+							<h3 class="lighter block green" style="position: relative;left: 95px;">站点信息</h3>
 							
 							<div class="form-horizontal">
 								<div class="control-group">
