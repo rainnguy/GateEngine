@@ -20,13 +20,17 @@ $(function() {
 		var step = info.step;
 		if (document.getElementById("stationHelp").innerText != "" ||
 				(document.getElementById("numberHelp").innerText != "" && step == 1) ||
-				(document.getElementById("bankHelp").innerText != "" && step == 2)) {
+				(document.getElementById("numberHelp").innerText == "" && 
+						(document.getElementById("bankHelp").innerText != "" ||
+						document.getElementById("bank").value == "") && step == 2)) {
 			document.getElementById("after").disabled = "disabled";
 		} else {
 			document.getElementById("after").disabled = "";
 		}
 		
-		if(document.getElementById("submit").disabled == "") {
+		if(step == 3 && document.getElementById("stationHelp").innerText == "" &&
+				document.getElementById("numberHelp").innerText == "" &&
+				document.getElementById("bankHelp").innerText == "") {
 			// 确认并组装数据
 			checkCustomerOder();
 			
@@ -35,8 +39,8 @@ $(function() {
 		}
 	}).on('finished', function(e) {
 		
-		// 把订单信息保存到数据库
-		saveOrder();
+		// 把订单信息保存到数据库 TODO
+//		saveOrder();
 		
 		// 调用网关进行支付
 		document.getElementById("payform").submit();
@@ -162,7 +166,7 @@ function changePayType() {
 	} else {
 		document.getElementById("confirmPayType").value = "";
 	}
-	document.getElementById("submit").disabled = "disabled";
+	document.getElementById("after").disabled = "disabled";
 	document.getElementById("bank").value = "";
 	document.getElementById("bankValue").value = "";
 	document.getElementById("transName").value = "";
@@ -179,7 +183,7 @@ function changeCardType() {
 	} else {
 		document.getElementById("confirmPayCardType").value = "";
 	}
-	document.getElementById("submit").disabled = "disabled";
+	document.getElementById("after").disabled = "disabled";
 	document.getElementById("bank").value = "";
 	document.getElementById("bankValue").value = "";
 	document.getElementById("transName").value = "";
@@ -196,12 +200,10 @@ function changeBank() {
 			if (bankValue != "") {
 				document.getElementById("confirmPayBank").value = bankName;
 				document.getElementById("bankHelp").innerText = "";
-				document.getElementById("submit").disabled = "";
 				document.getElementById("after").disabled = "";
 			} else {
 				document.getElementById("confirmPayBank").value = "";
 				document.getElementById("bankHelp").innerText = "请选择支付银行！";
-				document.getElementById("submit").disabled = "disabled";
 				document.getElementById("after").disabled = "disabled";
 				document.getElementById("transName").value = "";
 				document.getElementById("plain").value = "";
@@ -259,7 +261,8 @@ function signDatatt() {
 		url : locat + '/gateway/signData.do',
 		data : {
 			plain : $("#plain").val(),
-			merchantNum : $("#merchantNum").val()
+			merchantNum : '983708160009501'
+//			merchantNum : $("#merchantNum").val()  TODO
 		},
 		dataType : 'json',
 		cache : false,
@@ -279,7 +282,6 @@ function showValue() {
 			document.getElementById("confirmMoney").value = moneyTemp + " 元";
 			document.getElementById("confirmPrice").value = price + " 元";
 			document.getElementById("realPrice").value = price;
-			document.getElementById("submit").disabled = "disabled";
 			document.getElementById("bank").value = "";
 			document.getElementById("bankValue").value = "";
 			document.getElementById("transName").value = "";
@@ -301,7 +303,6 @@ function changeNumber(){
 		document.getElementById("numberHelp").innerText = "";
 		document.getElementById("after").disabled = "";
 	}
-	document.getElementById("submit").disabled = "disabled";
 	document.getElementById("bank").value = "";
 	document.getElementById("bankValue").value = "";
 	document.getElementById("transName").value = "";
@@ -330,7 +331,6 @@ function showUseAbleStations() {
 				document.getElementById("after").disabled = "";
 			}
 			
-			document.getElementById("submit").disabled = "disabled";
 			document.getElementById("bank").value = "";
 			document.getElementById("bankValue").value = "";
 			document.getElementById("transName").value = "";
@@ -426,9 +426,9 @@ function saveOrder() {
 			merchantNum : document.getElementById("merchantNum").value,
 			price : document.getElementById("realPrice").value,
 			number : document.getElementById("number").value,
-			payType : document.getElementById("payTypeHidden").value,
+			payType : document.getElementById("confirmPayType").value,
 			payBank : document.getElementById("bankValue").value,
-			cardType : document.getElementById("cardTypeHidden").value
+			cardType : document.getElementById("confirmPayCardType").value
 		},
 		dataType : 'json',
 		cache : false,

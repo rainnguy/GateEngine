@@ -196,7 +196,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">面值：</label>
 											<input type="text" class="span8" id="confirmMoney" value="200 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmMoney">200 元</label> -->
 										</span>
 									</div>
 									
@@ -204,7 +203,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">价格：</label>
 											<input type="text" class="span8" id="confirmPrice" value="198 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmPrice">198 元</label> -->
 										</span>
 									</div>
 									
@@ -212,7 +210,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">数量：</label>
 											<input type="text" class="span8" id="confirmNumber" value="1" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmNumber">1</label> -->
 										</span>
 									</div>
 									
@@ -220,7 +217,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">总金额：</label>
 											<input type="text" class="span8" id="confirmAmount" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmAmount"></label> -->
 										</span>
 									</div>
 									
@@ -228,7 +224,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">支付方式：</label>
 											<input type="text" class="span8" id="confirmPayType" value="网银支付" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmPayType">网银支付</label> -->
 										</span>
 									</div>
 									
@@ -236,7 +231,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">支付银行：</label>
 											<input type="text" class="span8" id="confirmPayBank" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmPayBank"></label> -->
 										</span>
 									</div>
 									
@@ -244,7 +238,6 @@
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">卡种：</label>
 											<input type="text" class="span8" id="confirmPayCardType" value="借记卡" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
-<!-- 											<label id="confirmPayCardType">借记卡</label> -->
 										</span>
 									</div>
 								</div>
@@ -255,8 +248,6 @@
 									<input type="hidden" name="transName" id="transName" value="" />
 									<input type="hidden" name="Plain" id="plain" value="" />
 									<input type="hidden" name="Signature" id="signature" value="" />
-									<input type="submit" id="submit" name="submit" class="orgBtnlong"
-										value="支付" disabled="disabled" onclick="saveOrder()"/>
 								</form>
 							</div>
 						</div>

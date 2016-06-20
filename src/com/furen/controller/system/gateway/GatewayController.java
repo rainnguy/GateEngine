@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.csii.payment.client.core.MerchantSignVerify;
 import com.csii.payment.client.core.MerchantSignVerifyExt;
 import com.furen.controller.base.BaseController;
 import com.furen.entity.system.Department;
@@ -43,11 +44,63 @@ public class GatewayController extends BaseController {
 	public ModelAndView payPage() throws Exception {
 		
 		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
 		
-		// 获取可选择的站点
-		getStations(mv);
+		String plain = pd.getString("Plain");
+		String signature = pd.getString("Signature");
 		
-		mv.setViewName("/system/gateway/payPage");
+		if (plain != null && signature != null) {
+			if (MerchantSignVerify.merchantVerifyPayGate_ABA(signature, plain)) {
+				// 获取plain中的数据
+				String[] array=plain.split("\\|");
+				Map<String,String> map = new HashMap<String,String>();
+				for (int i = 0; i < array.length; i++) {
+					if (array[i].startsWith("TranAbbr=")) {
+						map.put("tranAbbr", array[i].substring(9));
+					} else if (array[i].startsWith("AcqSsn=")) {
+						map.put("acqSsn", array[i].substring(7));
+					} else if (array[i].startsWith("MercDtTm=")) {
+						map.put("mercDtTm", array[i].substring(9));
+					} else if (array[i].startsWith("TermSsn=")) {
+						map.put("termSsn", array[i].substring(8));
+					} else if (array[i].startsWith("TermCode=")) {
+						map.put("termCode", array[i].substring(9));
+					} else if (array[i].startsWith("MercCode=")) {
+						map.put("mercCode", array[i].substring(9));
+					} else if (array[i].startsWith("TranAmt=")) {
+						map.put("tranAmt", array[i].substring(8));
+					} else if (array[i].startsWith("ClearDate=")) {
+						map.put("clearDate", array[i].substring(10));
+					} else if (array[i].startsWith("RespCode=")) {
+						map.put("respCode", array[i].substring(9));
+					}
+				}
+				String respCode = map.get("respCode");
+				if ("00".equals(respCode)) {
+					// 跳转交易成功页面
+					mv.setViewName("/system/gateway/successPage");
+				} else {
+					mv.addObject("errorInfo", "交易失败！响应码：" + respCode);
+					// 跳转交易失败页面
+					mv.setViewName("/system/gateway/failurePage");
+				}
+				
+				// 网关响应信息存入数据库 TODO
+				
+				
+			} else {
+				mv.addObject("errorInfo", "网关数据验签失败！");
+				// 跳转交易失败页面
+				mv.setViewName("/system/gateway/failurePage");
+			}
+		} else {
+			// 获取可选择的站点
+			getStations(mv);
+			
+//			mv.setViewName("/system/gateway/payPage");
+			mv.setViewName("/system/gateway/prepay");
+		}
 		
 		return mv;
 	}
@@ -64,7 +117,7 @@ public class GatewayController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		
 		mv.addObject("description", "pay test");
-		mv.setViewName("/system/gateway/prepay");
+		mv.setViewName("/system/gateway/backup");
 		
 		return mv;
 	}
@@ -87,7 +140,7 @@ public class GatewayController extends BaseController {
 		PageData pd = new PageData();
 		
 		pd = this.getPageData();
-		String merchantNum = pd.getString("requestMethod");
+		String merchantNum = pd.getString("merchantNum");
 		
 		try{
 			stationMap = departmentService.getAllUseAbleStations(merchantNum);
@@ -122,14 +175,30 @@ public class GatewayController extends BaseController {
 		String plain = pd.getString("plain");
 		String merchantNum = pd.getString("merchantNum");
 		// TODO 商户号目前是假的
-//		MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_"+merchantNum,
-//				"key_password_"+merchantNum, plain);
-		String signature = MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_983708160009501",
-				"key_password_983708160009501", plain);
+		String signature = MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_"+merchantNum,
+				"key_password_"+merchantNum, plain);
 		
 		map.put("signature", signature);
 		
 		return AppUtil.returnObject(new PageData(), map);
+		
+	}
+	
+	/**
+	 * 把订单信息保存到数据库
+	 */
+	@RequestMapping("saveOrderInfo")
+	public void saveOrderInfo(){
+		// TODO 功能未实现
+		PageData pd = new PageData();
+		
+		pd = this.getPageData();
+		String merchantNum = pd.getString("merchantNum");
+		String price = pd.getString("price");
+		String number = pd.getString("number");
+		String payType = pd.getString("payType");
+		String payBank = pd.getString("payBank");
+		String cardType = pd.getString("cardType");
 		
 	}
 	
