@@ -45,11 +45,6 @@ $(function() {
 		// 调用网关进行支付
 		document.getElementById("payform").submit();
 		
-		bootbox.dialog("支付完成！", [{
-			"label" : "OK",
-			"class" : "btn-small btn-primary",
-			}]
-		);
 	});
 
 	$('#validation-form').hide();
@@ -384,7 +379,6 @@ function establishData() {
 	var merchantName = "";
 	
 	// 支付交易中，接收交易结果的url
-//	var mercUrl = "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2F404.jsp";
 	var mercUrl = "http%3A%2F%2Flocalhost%3A8088%2FGateWayEngine%2Fgateway%2FpayPage.do";
 
 	//交易缩写

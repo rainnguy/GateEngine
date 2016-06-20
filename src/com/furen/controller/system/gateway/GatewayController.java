@@ -80,6 +80,8 @@ public class GatewayController extends BaseController {
 				if ("00".equals(respCode)) {
 					// 跳转交易成功页面
 					mv.setViewName("/system/gateway/successPage");
+//					mv.setViewName("404");
+					
 				} else {
 					mv.addObject("errorInfo", "交易失败！响应码：" + respCode);
 					// 跳转交易失败页面
@@ -112,12 +114,28 @@ public class GatewayController extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping("prepay")
-	public ModelAndView prepay() throws Exception {
+	public ModelAndView prepay() {
 		
 		ModelAndView mv = this.getModelAndView();
 		
 		mv.addObject("description", "pay test");
 		mv.setViewName("/system/gateway/backup");
+		
+		return mv;
+	}
+	
+	/**
+	 * shopping main page
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("defaultPage")
+	public ModelAndView defaultPage() {
+		
+		ModelAndView mv = this.getModelAndView();
+		
+		mv.setViewName("/system/admin/default");
 		
 		return mv;
 	}

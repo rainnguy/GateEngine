@@ -2,7 +2,6 @@
 	<%
 		String path = request.getContextPath();
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-		String plain = request.getParameter("Plain");
 	%>
 	<!-- basic styles -->
 	<link rel="stylesheet" href="<%=basePath%>/static/css/bootstrap.min.css"  />

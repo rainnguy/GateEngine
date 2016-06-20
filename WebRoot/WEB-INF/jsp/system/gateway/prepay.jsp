@@ -65,7 +65,7 @@
 						</div>
 						
 						<div class="step-pane" id="step2">
-							<h3 class="lighter block green">商品信息</h3>
+							<h3 class="lighter block green" style="position: relative;left: 95px;">商品信息</h3>
 							
 							<div class="form-horizontal">
 								<div class="control-group">
@@ -119,7 +119,7 @@
 						</div>
 						
 						<div class="step-pane" id="step3">
-							<h3 class="lighter block green">支付信息</h3>
+							<h3 class="lighter block green" style="position: relative;left: 95px;">支付信息</h3>
 							
 							<div class="form-horizontal">
 								<div class="control-group">
@@ -174,7 +174,7 @@
 						</div>
 						
 						<div class="step-pane" id="step4">
-							<h3 class="lighter block green">确认支付</h3>
+							<h3 class="lighter block green" style="position: relative;left: 95px;">确认支付</h3>
 							
 							<div class="form-horizontal">
 								<div class="control-group">
