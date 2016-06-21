@@ -88,7 +88,7 @@
 			<div class="controls">
 				<div class="main_input_box">
 					<font color="blue"><span id="nameerr">JiangYin Furen High-Tech Co.,Ltd
-							2015</span></font>
+							2016</span></font>
 				</div>
 			</div>
 		</div>
@@ -97,7 +97,7 @@
 		<div class="camera_wrap camera_emboss" id="camera_slide">
 			<div data-src="static/login/images/banner_slide_01.jpg"></div>
 			<div data-src="static/login/images/banner_slide_02.jpg"></div>
-			<div data-src="static/login/images/banner_slide_03.jpg"></div>
+<!-- 			<div data-src="static/login/images/banner_slide_03.jpg"></div> -->
 		</div>
 		<!-- #camera_wrap_3 -->
 	</div>

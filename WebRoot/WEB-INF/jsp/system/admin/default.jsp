@@ -29,6 +29,7 @@
 
 		</div>
 		<!-- #main-content -->
+		<a href="<%=basePath%>/gateway/payPage.do"><img src="static/login/images/main_page2.jpg"></a>
 	</div>
 </body>
 </html>
