@@ -21,8 +21,10 @@
 		<typeAlias type="com.furen.entity.system.TransAccount" alias="TransAccount"/>
 		<!-- 机构管理 -->
 		<typeAlias type="com.furen.entity.system.Department" alias="Department"/>
+		<!-- 网关 -->
+		<typeAlias type="com.furen.entity.system.Gateway" alias="Gateway"/> 
 		<!-- 数据字典 -->
-		<typeAlias type="com.furen.entity.system.Dictionary" alias="Dictionary"/>
+		<typeAlias type="com.furen.entity.system.Dictionary" alias="Dictionary"/> 
 		<!-- 日志 -->
 		<typeAlias type="com.furen.entity.system.Log" alias="Log"/>
 		

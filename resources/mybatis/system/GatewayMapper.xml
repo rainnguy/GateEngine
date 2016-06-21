@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GatewayMapper">
+
+	<resultMap type="Gateway" id="gatewayResultMap">
+		<result property="respCode" column="code"/>
+		<result property="respCodeContent" column="content"/>
+	</resultMap>
+
+	<!-- 获取响应码的含义 -->
+	<select id="getContOfRespCode" resultMap="gatewayResultMap">
+		select
+			rc.code,
+			rc.content
+		from
+			resp_code rc
+		where
+			rc.code = #{code}
+			and rc.type = (
+				select
+					ta.type
+				from
+					tran_abbr ta
+				where
+					ta.code = #{tranAbbr}
+			)
+	</select>
+
+</mapper>

@@ -3,14 +3,13 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<%@include file="/common/common.jsp"%>
-		<script type="text/javascript" src="<%=basePath%>/static/js/gateway/successPage.js"></script>
-		 
-		<meta name="description" content="404 Error Page" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="refresh" content ="10;url=<%=basePath%>gateway/defaultPage.do">
-		
+<head>
+	<%@include file="/common/common.jsp"%>
+	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/successPage.js"></script>
+	 
+	<meta http-equiv="refresh" content ="10;url=<%=basePath%>gateway/defaultPage.do">
+</head>
+
 <body onload="shownum()">
 	<div class="error-container">
 		<div class="well">

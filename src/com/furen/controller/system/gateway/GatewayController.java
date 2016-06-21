@@ -17,7 +17,9 @@ import com.csii.payment.client.core.MerchantSignVerify;
 import com.csii.payment.client.core.MerchantSignVerifyExt;
 import com.furen.controller.base.BaseController;
 import com.furen.entity.system.Department;
+import com.furen.entity.system.Gateway;
 import com.furen.service.system.department.DepartmentService;
+import com.furen.service.system.gateway.GatewayService;
 import com.furen.util.AppUtil;
 import com.furen.util.PageData;
 
@@ -33,6 +35,9 @@ public class GatewayController extends BaseController {
 
 	@Resource(name="departmentService")
 	private DepartmentService departmentService;
+	
+	@Resource(name="gatewayService")
+	private GatewayService gatewayService;
 	
 	/**
 	 * 购买页面
@@ -80,10 +85,22 @@ public class GatewayController extends BaseController {
 				if ("00".equals(respCode)) {
 					// 跳转交易成功页面
 					mv.setViewName("/system/gateway/successPage");
-//					mv.setViewName("404");
 					
 				} else {
-					mv.addObject("errorInfo", "交易失败！响应码：" + respCode);
+					
+					Map<String, String> codeMap = new HashMap<String, String>();
+					codeMap.put("tranAbbr", map.get("tranAbbr"));
+					codeMap.put("code", respCode);
+					// 获取响应码的含义
+					Gateway gateway = gatewayService.getContOfRespCode(codeMap);
+					mv.addObject("errorCode", "响应码：" + respCode);
+
+					String content = "";
+					if (gateway != null) {
+						content = gateway.getRespCodeContent();
+					}
+					// 响应码含义
+					mv.addObject("errorInfo", content);
 					// 跳转交易失败页面
 					mv.setViewName("/system/gateway/failurePage");
 				}
@@ -92,6 +109,7 @@ public class GatewayController extends BaseController {
 				
 				
 			} else {
+				mv.addObject("errorCode", "");
 				mv.addObject("errorInfo", "网关数据验签失败！");
 				// 跳转交易失败页面
 				mv.setViewName("/system/gateway/failurePage");
@@ -100,7 +118,6 @@ public class GatewayController extends BaseController {
 			// 获取可选择的站点
 			getStations(mv);
 			
-//			mv.setViewName("/system/gateway/payPage");
 			mv.setViewName("/system/gateway/prepay");
 		}
 		
