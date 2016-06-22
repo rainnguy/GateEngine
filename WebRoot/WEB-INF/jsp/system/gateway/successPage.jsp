@@ -7,7 +7,7 @@
 	<%@include file="/common/common.jsp"%>
 	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/successPage.js"></script>
 	 
-	<meta http-equiv="refresh" content ="10;url=<%=basePath%>gateway/defaultPage.do">
+	<meta http-equiv="refresh" content ="9;url=<%=basePath%>gateway/defaultPage.do">
 </head>
 
 <body onload="shownum()">

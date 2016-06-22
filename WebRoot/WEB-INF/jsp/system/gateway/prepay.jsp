@@ -7,7 +7,7 @@
 <html>
 <head>
 	<%@include file="/common/common.jsp"%>
-	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/payPage.js"></script>
+	<script type="text/javascript" src="<%=basePath%>/static/js/gateway/prepay.js"></script>
 </head>
 
 <body>
@@ -47,7 +47,6 @@
 												</c:forEach>
 											</select>
 											<input type="hidden" id="merchantNum" value="" />
-											<input type="hidden" id="merchantName" value="" />
 										</span>
 									</div>
 									<span class="help-inline" id="stationHelp"></span>
@@ -136,8 +135,8 @@
 									<label class="control-label">卡种</label>
 									<div class="controls">
 										<span class="span12">
-											<label class="blue"><input id="cardType" name="cardType" value="0" type="radio" onclick="changeCardType()" checked /><span class="lbl"> 借记卡</span></label>
-											<label class="blue"><input id="cardType" name="cardType" value="1" type="radio" onclick="changeCardType()"/><span class="lbl"> 信用卡</span></label>
+											<label class="blue"><input id="cardType" name="cardType" value="1" type="radio" onclick="changeCardType()" checked /><span class="lbl"> 借记卡</span></label>
+											<label class="blue"><input id="cardType" name="cardType" value="U" type="radio" onclick="changeCardType()"/><span class="lbl"> 信用卡</span></label>
 										</span>
 									</div>
 								</div>
@@ -184,7 +183,7 @@
 											<input type="text" class="span8" id="confirmStation" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
 										</span>
 									</div>
-<!-- 									<label id="confirmStation"></label> -->
+									
 									<div class="controls">
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">商品：</label>
@@ -240,6 +239,7 @@
 											<input type="text" class="span8" id="confirmPayCardType" value="借记卡" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
 										</span>
 									</div>
+									<input type="hidden" id="termSsn" value="" />
 								</div>
 							</div>
 							

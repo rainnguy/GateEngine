@@ -27,4 +27,14 @@ public class GatewayService {
 		return (Gateway) dao.findForObject("GatewayMapper.getContOfRespCode", codeMap);
 	}
 	
+	/**
+	 * 获取请求交易时的交易缩写
+	 * @param codeMap
+	 * @return
+	 * @throws Exception
+	 */
+	public Gateway getRequTranAbbr(Map<String, String> codeMap) throws Exception  {
+		return (Gateway) dao.findForObject("GatewayMapper.getRequTranAbbr", codeMap);
+	}
+	
 }

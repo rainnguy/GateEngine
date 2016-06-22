@@ -12,11 +12,30 @@ package com.furen.entity.system;
  */
 public class Gateway {
 	
+	/** 交易缩写 */
+	private String tranAbbr = null;
+	
 	/** 返回码 */
-	String respCode = null;
+	private String respCode = null;
 	
 	/** 返回码的含义 */
-	String respCodeContent = null;
+	private String respCodeContent = null;
+
+	/**
+	 * 交易缩写
+	 * @return the tranAbbr
+	 */
+	public String getTranAbbr() {
+		return tranAbbr;
+	}
+
+	/**
+	 * 交易缩写
+	 * @param tranAbbr the tranAbbr to set
+	 */
+	public void setTranAbbr(String tranAbbr) {
+		this.tranAbbr = tranAbbr;
+	}
 
 	/**
 	 * 返回码

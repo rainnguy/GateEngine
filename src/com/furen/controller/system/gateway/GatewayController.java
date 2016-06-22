@@ -20,6 +20,7 @@ import com.furen.entity.system.Department;
 import com.furen.entity.system.Gateway;
 import com.furen.service.system.department.DepartmentService;
 import com.furen.service.system.gateway.GatewayService;
+import com.furen.service.system.order.OrderService;
 import com.furen.util.AppUtil;
 import com.furen.util.PageData;
 
@@ -38,6 +39,9 @@ public class GatewayController extends BaseController {
 	
 	@Resource(name="gatewayService")
 	private GatewayService gatewayService;
+	
+	@Resource(name="orderService")
+	private OrderService orderService;
 	
 	/**
 	 * 购买页面
@@ -82,22 +86,40 @@ public class GatewayController extends BaseController {
 					}
 				}
 				String respCode = map.get("respCode");
+				Integer count = 0;
 				if ("00".equals(respCode)) {
 					// 跳转交易成功页面
 					mv.setViewName("/system/gateway/successPage");
 					
+					// 更新订单状态
+					map.put("status", "2");
+					count = orderService.updateOrderStatus(map);
+					if(count != 1){
+						// TODO 更新订单失败的处理
+					}
 				} else {
 					
 					Map<String, String> codeMap = new HashMap<String, String>();
-					codeMap.put("tranAbbr", map.get("tranAbbr"));
 					codeMap.put("code", respCode);
+					codeMap.put("termSsn", map.get("termSsn"));
+					codeMap.put("mercCode", map.get("mercCode"));
+					
+					// 获取请求交易时的交易缩写
+					Gateway gatewayRequest = gatewayService.getRequTranAbbr(codeMap);
+					
+					String tranAbbr = "";
+					if (gatewayRequest != null) {
+						tranAbbr = gatewayRequest.getTranAbbr();
+					}
+					codeMap.put("tranAbbr", tranAbbr);
+					
 					// 获取响应码的含义
-					Gateway gateway = gatewayService.getContOfRespCode(codeMap);
+					Gateway gatewayResp = gatewayService.getContOfRespCode(codeMap);
 					mv.addObject("errorCode", "响应码：" + respCode);
 
 					String content = "";
-					if (gateway != null) {
-						content = gateway.getRespCodeContent();
+					if (gatewayResp != null) {
+						content = gatewayResp.getRespCodeContent();
 					}
 					// 响应码含义
 					mv.addObject("errorInfo", content);
@@ -105,8 +127,11 @@ public class GatewayController extends BaseController {
 					mv.setViewName("/system/gateway/failurePage");
 				}
 				
-				// 网关响应信息存入数据库 TODO
-				
+				// 更新网关响应信息
+				count = orderService.updateOrderInfo(map);
+				if(count != 1){
+					// TODO 更新网关响应信息失败的处理
+				}
 				
 			} else {
 				mv.addObject("errorCode", "");
@@ -209,31 +234,12 @@ public class GatewayController extends BaseController {
 		pd = this.getPageData();
 		String plain = pd.getString("plain");
 		String merchantNum = pd.getString("merchantNum");
-		// TODO 商户号目前是假的
-		String signature = MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_"+merchantNum,
-				"key_password_"+merchantNum, plain);
+		String signature = MerchantSignVerifyExt.merchantSignData_ABA_EXT("key_alias_" + merchantNum,
+				"key_password_" + merchantNum, plain);
 		
 		map.put("signature", signature);
 		
 		return AppUtil.returnObject(new PageData(), map);
-		
-	}
-	
-	/**
-	 * 把订单信息保存到数据库
-	 */
-	@RequestMapping("saveOrderInfo")
-	public void saveOrderInfo(){
-		// TODO 功能未实现
-		PageData pd = new PageData();
-		
-		pd = this.getPageData();
-		String merchantNum = pd.getString("merchantNum");
-		String price = pd.getString("price");
-		String number = pd.getString("number");
-		String payType = pd.getString("payType");
-		String payBank = pd.getString("payBank");
-		String cardType = pd.getString("cardType");
 		
 	}
 	

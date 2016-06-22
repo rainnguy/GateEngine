@@ -6,6 +6,7 @@
 	<resultMap type="Gateway" id="gatewayResultMap">
 		<result property="respCode" column="code"/>
 		<result property="respCodeContent" column="content"/>
+		<result property="tranAbbr" column="tran_abbr"/>
 	</resultMap>
 
 	<!-- 获取响应码的含义 -->
@@ -26,5 +27,17 @@
 					ta.code = #{tranAbbr}
 			)
 	</select>
-
+	
+	<!-- 获取请求交易时的交易缩写 -->
+	<select id="getRequTranAbbr" resultMap="gatewayResultMap">
+		select
+			tran_abbr
+		from
+			orders
+		where
+			order_code = #{termSsn}
+			and merchant_num = #{mercCode}
+			and del_flag = '1'
+	</select>
+	
 </mapper>

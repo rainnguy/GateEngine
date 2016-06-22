@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+
+	<resultMap type="Order" id="orderResultMap">
+	</resultMap>
+
+	<!-- 插入订单数据 -->
+	<insert id="insertOrder" parameterType="pd" flushCache="false">
+		insert into orders (
+			order_code,
+			order_time,
+			order_status,
+			tran_abbr,
+			user_code,
+			merchant_num,
+			merchant_name,
+			goods_name,
+			goods_value,
+			price,
+			number,
+			amount,
+			pay_type,
+			pay_type_content,
+			pay_bank,
+			pay_bank_name,
+			card_type,
+			card_type_content
+		) values (
+			#{termSsn},
+			DATE_FORMAT(sysdate(),'%Y-%m-%d %H:%i:%s'),
+			'1',
+			#{transName},
+			#{user},
+			#{merchantNum},
+			#{merchantName},
+			#{goodsName},
+			#{goodsValue},
+			#{price},
+			#{number},
+			#{amount},
+			#{payType},
+			#{payTypeContent},
+			#{payBank},
+			#{payBankName},
+			#{cardType},
+			#{cardTypeContent}
+		)
+	</insert>
+
+	<!-- 更新订单状态 -->
+	<update id="updateOrderStatus" parameterType="map" flushCache="false">
+		update orders
+		set order_status = #{status}
+		where 
+			order_code = #{termSsn}
+			and del_flag = '1'
+	</update>
+	
+	<!-- 更新网关响应信息 -->
+	<update id="updateOrderInfo" parameterType="map" flushCache="false">
+		update orders
+		set acq_ssn = #{termSsn},
+			resp_code = #{respCode},
+			term_code = #{termCode},
+			clear_date = #{clearDate}
+		where 
+			order_code = #{termSsn}
+			and del_flag = '1'
+	</update>
+
+</mapper>
