@@ -32,7 +32,7 @@
 			DATE_FORMAT(sysdate(),'%Y-%m-%d %H:%i:%s'),
 			'1',
 			#{transName},
-			#{user},
+			#{userCode},
 			#{merchantNum},
 			#{merchantName},
 			#{goodsName},
