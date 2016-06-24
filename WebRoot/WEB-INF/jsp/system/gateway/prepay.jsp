@@ -48,8 +48,8 @@
 											</select>
 											<input type="hidden" id="merchantNum" value="" />
 										</span>
+										<span class="help-inline" id="stationHelp" style="color: #FF0000"></span>
 									</div>
-									<span class="help-inline" id="stationHelp"></span>
 								</div>
 								
 								<div class="control-group">
@@ -82,14 +82,8 @@
 									<div class="controls">
 										<span class="span12">
 											<select class="span2" id="money" name="money" onchange="showValue()">
-												<option value="50">50</option>
-												<option value="100">100</option>
-												<option value="150">150</option>
-												<option value="200" selected>200</option>
-												<option value="300">300</option>
-												<option value="500">500</option>
-												<option value="1000">1000</option>
 											</select>
+											<span class="help-inline" id="moneyHelp" style="color: #FF0000"></span>
 										</span>
 									</div>
 								</div>
@@ -99,7 +93,7 @@
 									<div class="controls">
 										<span class="span6 input-icon input-icon-right">
 											<input type="hidden" name="discount" id="discount" value="0.99" />
-											<input type="text" class="span3" id="realPrice" style="color: #0000FF; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" value="198" readonly="readonly" />
+											<input type="text" class="span3" id="realPrice" style="color: #0000FF; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" value="" readonly="readonly" />
 										</span>
 									</div>
 								</div>
@@ -194,14 +188,14 @@
 									<div class="controls">
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">面值：</label>
-											<input type="text" class="span8" id="confirmMoney" value="200 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+											<input type="text" class="span8" id="confirmMoney" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
 										</span>
 									</div>
 									
 									<div class="controls">
 										<span class="span12 input-icon input-icon-right">
 											<label class="control-label">价格：</label>
-											<input type="text" class="span8" id="confirmPrice" value="198 元" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
+											<input type="text" class="span8" id="confirmPrice" value="" style="color: #000000; outline: none; border:none; background:none; background:rgba(0, 0, 0, 0)" readonly="readonly"/>
 										</span>
 									</div>
 									

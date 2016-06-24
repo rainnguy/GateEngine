@@ -23,6 +23,8 @@
 		<typeAlias type="com.furen.entity.system.Department" alias="Department"/>
 		<!-- 网关 -->
 		<typeAlias type="com.furen.entity.system.Gateway" alias="Gateway"/>
+		<!-- 商品 -->
+		<typeAlias type="com.furen.entity.system.Cargo" alias="Cargo"/>
 		<!-- 订单 -->
 		<typeAlias type="com.furen.entity.system.Order" alias="Order"/>
 		<!-- 数据字典 -->

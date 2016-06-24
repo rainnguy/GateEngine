@@ -10,7 +10,7 @@
 	</resultMap>
 
 	<!-- 获取响应码的含义 -->
-	<select id="getContOfRespCode" resultMap="gatewayResultMap">
+	<select id="getContOfRespCode" parameterType="map" resultMap="gatewayResultMap">
 		select
 			rc.code,
 			rc.content
@@ -29,7 +29,7 @@
 	</select>
 	
 	<!-- 获取请求交易时的交易缩写 -->
-	<select id="getRequTranAbbr" resultMap="gatewayResultMap">
+	<select id="getRequTranAbbr" parameterType="map" resultMap="gatewayResultMap">
 		select
 			tran_abbr
 		from

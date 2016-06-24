@@ -210,7 +210,7 @@ public class GatewayController extends BaseController {
 		}
 		
 		for(Department department : stationMap){
-			useAbleStations = useAbleStations + department.getDepartmentName().toString() + "\r\n";
+			useAbleStations = useAbleStations + department.getDepartmentName() + "\r\n";
 		}
 		// 商品描述
 		map.put("useAbleStations", useAbleStations);
@@ -248,7 +248,7 @@ public class GatewayController extends BaseController {
 	 * 
 	 * @param mv
 	 */
-	private void getStations(ModelAndView mv){
+	private void getStations(ModelAndView mv) {
 		
 		Map<String, String> orgCodeMap = new LinkedHashMap<String, String>();
 		// 设置默认的空值
@@ -270,4 +270,5 @@ public class GatewayController extends BaseController {
 		
 		mv.addObject("orgValue", orgCodeMap);
 	}
+	
 }

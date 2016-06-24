@@ -16,32 +16,93 @@ $(function() {
 	.on('change', function(){
 		$(this).closest('form').validate().element($(this));
 	});
-	$('#fuelux-wizard').ace_wizard().on('change' , function(e, info){
-		var step = info.step;
-		if (document.getElementById("stationHelp").innerText != "" ||
-				(document.getElementById("numberHelp").innerText != "" && step == 1) ||
-				(document.getElementById("numberHelp").innerText == "" && 
-						(document.getElementById("bankHelp").innerText != "" ||
-						document.getElementById("bank").value == "") && step == 2)) {
-			document.getElementById("after").disabled = "disabled";
-		} else {
-			document.getElementById("after").disabled = "";
+	// 获取点击的按钮，是“上一步”还是“下一步”
+	var button = "";
+	var arr = document.getElementsByTagName('button');
+	for(var i = 0;i<arr.length;i++){
+		arr[i].onclick = function(){
+			button = this.id;
 		}
+	}
+	
+	$('#fuelux-wizard').ace_wizard().on('change' , function(e, info){
 		
-		if(step == 3 && document.getElementById("stationHelp").innerText == "" &&
-				document.getElementById("numberHelp").innerText == "" &&
-				document.getElementById("bankHelp").innerText == "") {
+		var step = info.step;
+		
+		// 最后一步，组装数据
+		if(button == "after" && step == 3 && document.getElementById("station").value != "" &&
+			document.getElementById("number").value != "" && document.getElementById("money").value != "" &&
+				document.getElementById("bank").value != "") {
 			// 确认并组装数据
 			checkCustomerOder();
 			
 			// 调用后台，对数据进行签名
 			signDatatt();
 		}
+		
+		// 判断可否点击“下一步”
+		if (document.getElementById("station").value == "") {
+			document.getElementById("after").disabled = "disabled";
+		} else if (button == "before" && ((step == 3 && (document.getElementById("money").value == "" ||
+			document.getElementById("numberHelp").innerText != "")) || (step == 4 && document.getElementById("bank").value == ""))) {
+			document.getElementById("after").disabled = "disabled";
+		} else if (button == "after" &&
+			((step == 1 && (document.getElementById("money").value == "" || document.getElementById("numberHelp").innerText != "")) ||
+				(step == 2 && document.getElementById("bank").value == "") ||
+				(step == 3 && (document.getElementById("confirmStation").value == "" || document.getElementById("confirmMoney").value == "" ||
+				document.getElementById("confirmPrice").value == "" || document.getElementById("confirmNumber").value == "" ||
+				document.getElementById("confirmAmount").value == "" || document.getElementById("confirmPayBank").value == "")))) {
+			document.getElementById("after").disabled = "disabled";
+			if(step == 3){
+				alert(document.getElementById("confirmStation").value);
+				alert(document.getElementById("confirmMoney").value);
+				alert(document.getElementById("confirmPrice").value);
+				alert(document.getElementById("confirmNumber").value);
+				alert(document.getElementById("confirmAmount").value);
+				alert(document.getElementById("confirmPayBank").value);
+			}
+		} else {
+			document.getElementById("after").disabled = "";
+		}
+		
+		if (step == 1) {
+			// 调用后台去获取可选择的面值
+			$.ajax({
+				type : "POST",
+				url : locat + '/cargo/getSelectableCargoes.do',
+				data : {
+					merchantNum : $("#merchantNum").val()
+				},
+				dataType : 'json',
+				cache : false,
+				success : function(data) {
+					
+					// 清空下拉列表
+					document.getElementById("money").length = 0;
+					
+					if ("success" == data.errInfo) {
+						var s1 = data.goodsValue.split(",");
+						var s2 = data.price.split(",");
+						var sel = document.getElementById("money");
+						
+						if (s1.length == s2.length) {
+							for (var i = 0; i < s1.length; i++) {
+								var op = new Option(s1[i],s2[i]);
+								sel.options.add(op);
+							}
+						} else {
+							alert("获取可选择的面值时发生异常！");
+						}
+					} else {
+						alert("获取可选择的面值时发生异常！");
+					}
+				}
+			});
+		}
 	}).on('finished', function(e) {
 		
 		// 把订单信息保存到数据库, 调用网关进行支付
 		saveOrder();
-		
 	});
 
 	$('#validation-form').hide();
@@ -267,12 +328,24 @@ function signDatatt() {
 function showValue() {
 	for (var i = 0; i < money.length; i++) {
 		if (money.options[i].selected == true) {
-			var moneyTemp = money.options[i].value;
-			var discount = document.getElementById("discount").value;
-			var price = moneyTemp * discount;
-			document.getElementById("confirmMoney").value = moneyTemp + " 元";
-			document.getElementById("confirmPrice").value = price + " 元";
-			document.getElementById("realPrice").value = price;
+			var moneyTemp = money.options[i].text;
+			var price = money.options[i].value;
+			
+			if (moneyTemp == "") {
+				document.getElementById("confirmMoney").value = "";
+				document.getElementById("confirmPrice").value = "";
+				document.getElementById("realPrice").value = "";
+				document.getElementById("moneyHelp").innerText = "请选择要购买的面值！";
+				document.getElementById("after").disabled = "disabled";
+			} else {
+				document.getElementById("confirmMoney").value = moneyTemp + " 元";
+				document.getElementById("confirmPrice").value = price + " 元";
+				document.getElementById("realPrice").value = price;
+				document.getElementById("moneyHelp").innerText = "";
+				if (document.getElementById("numberHelp").innerText == "") {
+					document.getElementById("after").disabled = "";
+				}
+			}
 			document.getElementById("bank").value = "";
 			document.getElementById("bankValue").value = "";
 			document.getElementById("transName").value = "";
@@ -292,7 +365,9 @@ function changeNumber(){
 	} else {
 		document.getElementById("confirmNumber").value = number;
 		document.getElementById("numberHelp").innerText = "";
-		document.getElementById("after").disabled = "";
+		if (document.getElementById("moneyHelp").innerText == "") {
+			document.getElementById("after").disabled = "";
+		}
 	}
 	document.getElementById("bank").value = "";
 	document.getElementById("bankValue").value = "";
@@ -300,7 +375,7 @@ function changeNumber(){
 	document.getElementById("plain").value = "";
 }
 
-// 选择站点后显示可使用的站点
+// 选择站点后显示可使用的站点和可选择的面值
 function showUseAbleStations() {
 	
 	for (var i = 0; i < station.length; i++) {
@@ -320,6 +395,8 @@ function showUseAbleStations() {
 				document.getElementById("after").disabled = "";
 			}
 			
+			document.getElementById("money").length = 0; // 清空下拉列表
+			document.getElementById("realPrice").value = "";
 			document.getElementById("bank").value = "";
 			document.getElementById("bankValue").value = "";
 			document.getElementById("transName").value = "";
@@ -345,6 +422,7 @@ function showUseAbleStations() {
 			}
 		}
 	});
+	
 }
 
 // 组织数据
@@ -368,7 +446,7 @@ function establishData() {
 	// 商品名称
 	// var goodsName = document.getElementById("description").value;
 	var goodsName = document.getElementById("goodsName").value;
-	// 商户名称
+	// 商户名称 TODO 要encode一下才能传给网关，不然乱码
 	//	var merchantName = document.getElementById("confirmStation").value;
 	var merchantName = "";
 	

@@ -19,22 +19,22 @@ public class GatewayService {
 	
 	/**
 	 * 获取响应码的含义
-	 * @param codeMap
+	 * @param map
 	 * @return
 	 * @throws Exception
 	 */
-	public Gateway getContOfRespCode(Map<String, String> codeMap) throws Exception  {
-		return (Gateway) dao.findForObject("GatewayMapper.getContOfRespCode", codeMap);
+	public Gateway getContOfRespCode(Map<String, String> map) throws Exception  {
+		return (Gateway) dao.findForObject("GatewayMapper.getContOfRespCode", map);
 	}
 	
 	/**
 	 * 获取请求交易时的交易缩写
-	 * @param codeMap
+	 * @param map
 	 * @return
 	 * @throws Exception
 	 */
-	public Gateway getRequTranAbbr(Map<String, String> codeMap) throws Exception  {
-		return (Gateway) dao.findForObject("GatewayMapper.getRequTranAbbr", codeMap);
+	public Gateway getRequTranAbbr(Map<String, String> map) throws Exception  {
+		return (Gateway) dao.findForObject("GatewayMapper.getRequTranAbbr", map);
 	}
 	
 }
