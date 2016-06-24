@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.furen.controller.base.BaseController;
 import com.furen.entity.system.Cargo;
@@ -30,6 +31,23 @@ public class CargoController extends BaseController {
 
 	@Resource(name="cargoService")
 	private CargoService cargoService;
+	
+	/**
+	 * 商品管理页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("cargoList")
+	public ModelAndView cargoList() throws Exception {
+		
+		ModelAndView mv = this.getModelAndView();
+		
+		mv.addObject("user", "admin");
+		mv.setViewName("/system/cargo/cargoList");
+		
+		return mv;
+	}
 	
 	/**
 	 * 获取可选择的商品
