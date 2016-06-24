@@ -53,9 +53,6 @@ $(function() {
 				document.getElementById("confirmPrice").value == "" || document.getElementById("confirmNumber").value == "" ||
 				document.getElementById("confirmAmount").value == "" || document.getElementById("confirmPayBank").value == "")))) {
 			document.getElementById("after").disabled = "disabled";
-			if(step == 3){
-				//
-			}
 		} else {
 			document.getElementById("after").disabled = "";
 		}
@@ -74,6 +71,10 @@ $(function() {
 					
 					// 清空下拉列表
 					document.getElementById("money").length = 0;
+					// 清空价格
+					document.getElementById("realPrice").value = "";
+					// “下一步”不可点击
+					document.getElementById("after").disabled = "disabled";
 					
 					if ("success" == data.errInfo) {
 						var s1 = data.goodsValue.split(",");
@@ -485,7 +486,6 @@ function saveOrder() {
 		type : "POST",
 		url : locat + '/order/saveOrderInfo.do',
 		data : {
-			user : '', // TODO 未获取用户信息
 			transName : document.getElementById("transName").value,
 			termSsn : document.getElementById("termSsn").value,
 			merchantNum : document.getElementById("merchantNum").value,
