@@ -1,129 +1,224 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-%>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<%-- 	<%@include file="/common/common.jsp"%> --%>
-	
-			
-		<!-- 返回顶部  -->
-		<a href="#" id="btn-scroll-up" class="btn btn-small btn-inverse">
-			<i class="icon-double-angle-up icon-only"></i>
-		</a>
-		
-		<!-- 引入 -->
-		<script type="text/javascript">window.jQuery || document.write("<script src='<%=basePath%>static/1.9.1/jquery.min.js'>\x3C/script>");</script>
-		<script src="<%=basePath%>static/js/bootstrap.min.js"></script>
-		<script src="<%=basePath%>static/js/ace-elements.min.js"></script>
-		<!-- <script src="static/js/ace.min.js"></script> -->
-		
-		<script type="text/javascript" src="<%=basePath%>static/js/chosen.jquery.min.js"></script><!-- 下拉框 -->
-		<script type="text/javascript" src="<%=basePath%>static/js/bootbox.min.js"></script><!-- 确认窗口 -->
-		<script type="text/javascript" src="<%=basePath%>static/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script><!-- 日期框 -->
-		<script type="text/javascript" src="<%=basePath%>static/js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script><!-- 日期框 -->
-		<!-- 引入 -->
-		
-		
-		<script type="text/javascript" src="<%=basePath%>static/js/jquery.tips.js"></script><!--提示框-->
-		
-	<script type="text/javascript" src="<%=basePath%>static/js/cargo/cargoList.js"></script>
-</head>
-
+	<head>
+		<%@include file="/common/common.jsp"%>
+		<script type="text/javascript" src="<%=basePath%>static/js/cargo/cargoList.js"></script>
+	</head>
 <body>
-	<div>
-	<form action="user/listUsers.do" method="post" name="userForm" id="userForm">
-		<!-- 检索  -->
-		<table>
-			<tr>
-				<td>
-					<span class="input-icon">
-						<input autocomplete="off" id="nav-search-input" type="text" name="keyWord" value="" placeholder="这里输入关键词" />
-						<i id="nav-search-icon" class="icon-search"></i>
-					</span>
-				</td>
-				<td style="vertical-align:top;">
-					<button class="btn btn-mini btn-light" onclick="search();" title="检索">
-						<i id="nav-search-icon" class="icon-search"></i>
-					</button>
-				</td>
-			</tr>
-		</table>
-		
-		<table id="table_report" class="table table-striped table-bordered table-hover" style="width:100%;max-width:100%">
-			<!-- 表格头 -->
-			<thead>
-				<tr style="height:41px">
-					<th style="width:4%" class="center"><label><input type="checkbox" id="zcheckbox" /><span class="lbl"></span></label></th>
-					<th style="width:15%">商户号</th>
-					<th style="width:25%">商户名</th>
-					<th style="width:9%">商品名称</th>
-					<th style="width:8%">商品面值</th>
-					<th style="width:8%">商品价格</th>
-					<th style="width:6%">折扣</th>
-					<th style="width:17%">备注</th>
-					<th style="width:8%" class="center">操作</th>
-				</tr>
-			</thead>
-			
-			<tbody>
-				<tr style="height:41px;">
-					<td class='center' style="width:4%">
-<%-- 						<c:if test="${user.USERNAME != 'admin'}"><label><input type='checkbox' name='ids' value="${user.USER_ID }" id="${user.USERNAME }" alt="${user.PHONE }"/><span class="lbl"></span></label></c:if> --%>
-						<c:if test="${user == 'admin'}"><label><input type='checkbox' /><span class="lbl"></span></label></c:if>
-<!-- 						<input type='checkbox' name='ids' /> -->
-					</td>
-					<td>1111</td>
-					<td>2222</td>
-					<td>3333</td>
-					<td>4444</td>
-					<td>5555</td>
-					<td>6666</td>
-					<td>7777</td>
-					<td style="width:8%">
-						<div class='hidden-phone visible-desktop btn-group'>
-<%-- 							<c:if test="${pd.showEdit}"> --%>
-								<c:if test="${user=='admin'}">
-									<a class='btn btn-mini btn-info' title="编辑" onclick="editUser('admin');"><i class='icon-edit'></i></a>
-								</c:if>
-<%-- 							</c:if> --%>
-<%-- 							<c:if test="${pd.showDelete}"> --%>
+	<div class="container-fluid" id="main-container">
+		<div id="page-content" class="clearfix">
+  			<div class="row-fluid">
+				<div class="row-fluid">
+					<form action="role.do" method="post" name="roleForm" id="roleForm">
+						<!-- 检索  -->
+						<table>
+							<tr>
+								<td>
+									<span class="input-icon">
+										<input autocomplete="off" id="nav-search-input" type="text" name="name" value="${pd.name}" placeholder="这里输入关键词" />
+										<i id="nav-search-icon" class="icon-search"></i>
+									</span>
+								</td>
+								<td style="vertical-align:top;"><button class="btn btn-mini btn-light" onclick="search();" title="检索"><i id="nav-search-icon" class="icon-search"></i></button></td>
+							</tr>
+						</table>
+						<!-- 检索  -->
+						<table id="table_report" class="table table-striped table-bordered table-hover">
+							<thead>
+								<tr>
+									<th class="center">
+										<label><input type="checkbox" id="zcheckbox" /><span class="lbl"></span></label>
+									</th>
+									<th>序号</th>
+									<th>名称</th>
+									<th>角色级别</th>
+									<th>备注</th>
+									<th class="center">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- 开始循环 -->	
 								<c:choose>
-									<c:when test="${user=='admin'}">
-										<a class='btn btn-mini btn-danger' title="不能删除"><i class='icon-trash'></i></a>
+									<c:when test="${not empty roleList}">
+										<c:forEach items="${roleList}" var="role" varStatus="vs">
+											<tr>
+												<td class='center' style="width: 30px;">
+													<c:if test="${role.id != 1}"><label><input type='checkbox' name='ids' value="${role.id }" id="${role.id }" alt="${role.name }"/><span class="lbl"></span></label></c:if>
+												</td>
+												<td class='center' style="width: 30px;">${vs.index+1}</td>
+												<td>${role.name }</td>
+												<td>
+													${role.levelName }
+												</td>
+												<td>
+													${role.remark }
+												</td>
+												<td style="width: 60px;">
+													<div class='hidden-phone visible-desktop btn-group'>
+<%-- 														<c:if test="${pd.showEdit }"> --%>
+															<a class='btn btn-mini btn-info' title="编辑" onclick="toRoleInfo('${role.id }');">
+																<i class='icon-edit'></i>
+															</a>
+<%-- 														</c:if> --%>
+<%-- 														<c:if test="${role.id != 1 && pd.showDelete}"> --%>
+															<a class='btn btn-mini btn-danger' title="删除" onclick="deleteRole('${role.id }','${role.name }');">
+														 		<i class='icon-trash'></i>
+														 	</a>
+<%-- 														</c:if> --%>
+													</div>
+												</td>
+											</tr>
+										</c:forEach>
 									</c:when>
 									<c:otherwise>
-										<a class='btn btn-mini btn-danger' title="删除" onclick="delUser('admin');"><i class='icon-trash'></i></a>
+										<tr class="main_info">
+											<td colspan="10" class="center">没有相关数据</td>
+										</tr>
 									</c:otherwise>
 								</c:choose>
-<%-- 							</c:if> --%>
+							</tbody>
+						</table>
+						<div class="page-header position-relative">
+							<table style="width:100%;">
+								<tr>
+									<td style="vertical-align:top;">
+<%-- 										<c:if test="${pd.showAdd}"> --%>
+											<a class="btn btn-small btn-success" onclick="toRoleInfo('');">新增</a>
+<%-- 										</c:if> --%>
+									</td>
+									<td style="vertical-align:top;">
+										<div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">
+											${page.pageStr}
+										</div>
+									</td>
+								</tr>
+							</table>
 						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		
-		<div class="page-header position-relative">
-		<table style="width:100%;">
-			<tr>
-				<td style="vertical-align:top;">
-<%-- 					<c:if test="${pd.showAdd}"> --%>
-						<a class="btn btn-small btn-success" onclick="add();">新增</a>
-<%-- 					</c:if> --%>
-<%-- 					<c:if test="${pd.showDelete}"> --%>
-<!-- 						<a title="批量删除" class="btn btn-small btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" ><i class='icon-trash'></i></a> -->
-<%-- 					</c:if> --%>
-				</td>
-				<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
-			</tr>
-		</table>
+					</form>
+				</div>
+  			</div>
 		</div>
-	</form>
 	</div>
-
-</body>
+		
+	<!-- 返回顶部  -->
+	<a href="#" id="btn-scroll-up" class="btn btn-small btn-inverse">
+		<i class="icon-double-angle-up icon-only"></i>
+	</a>
+	<script type="text/javascript"> -->
+		
+		//菜单权限
+		function toRoleInfo(id){
+			 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag = true;
+			 if(id == '') {
+				 diag.Title = "新增角色";
+			 } else {
+				 diag.Title = "编辑角色";
+			 }
+			 diag.URL = '<%=basePath%>role/toRoleInfo.do?id='+id;
+			 diag.Width = 380;
+			 diag.Height = 420;
+			 diag.CancelEvent = function(){ //关闭事件
+				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+					 if('${page.currentPage}' == '0'){
+						 top.jzts();
+						 setTimeout("self.location=self.location",100);
+					 }else{
+						 nextPage(${page.currentPage});
+					 }
+				}
+				diag.close();
+			 };
+			 diag.show();
+		}
+		
+		//批量操作
+		function makeAll(msg){
+			bootbox.confirm(msg, function(result) {
+				if(result) {
+					var str = '';
+					var emstr = '';
+					var phones = '';
+					for(var i=0;i < document.getElementsByName('ids').length;i++)
+					{
+						  if(document.getElementsByName('ids')[i].checked){
+						  	if(str=='') str += document.getElementsByName('ids')[i].value;
+						  	else str += ',' + document.getElementsByName('ids')[i].value;
+						  	
+						  	if(emstr=='') emstr += document.getElementsByName('ids')[i].id;
+						  	else emstr += ';' + document.getElementsByName('ids')[i].id;
+						  	
+						  	if(phones=='') phones += document.getElementsByName('ids')[i].alt;
+						  	else phones += ';' + document.getElementsByName('ids')[i].alt;
+						  }
+					}
+					if(str==''){
+						bootbox.dialog("您没有选择任何内容!", 
+							[
+							  {
+								"label" : "关闭",
+								"class" : "btn-small btn-success",
+								"callback": function() {
+									//Example.show("great success");
+									}
+								}
+							 ]
+						);
+						
+						$("#zcheckbox").tips({
+							side:3,
+				            msg:'点这里全选',
+				            bg:'#AE81FF',
+				            time:8
+				        });
+						
+						return;
+					}else{
+						if(msg == '确定要删除选中的数据吗?'){
+							top.jzts();
+							$.ajax({
+								type: "POST",
+								url: '<%=basePath%>user/deleteAllU.do?tm='+new Date().getTime(),
+						    	data: {USER_IDS:str},
+								dataType:'json',
+								//beforeSend: validateData,
+								cache: false,
+								success: function(data){
+									 $.each(data.list, function(i, list){
+											nextPage(${page.currentPage});
+									 });
+								}
+							});
+						}else if(msg == '确定要给选中的用户发送邮件吗?'){
+							sendEmail(emstr);
+						}else if(msg == '确定要给选中的用户发送短信吗?'){
+							sendSms(phones);
+						}
+						
+						
+					}
+				}
+			});
+		}
+		
+		function deleteRole(id,name) {
+			bootbox.confirm("确定要删除角色：["+name+"]吗?", function(result) {
+				if(result) {
+					top.jzts();
+					var url = "<%=basePath%>role/delete.do?id="+id+"&name="+name+"&tm="+new Date().getTime();
+					$.get(url,function(data){
+						nextPage(${page.currentPage});
+					});
+				}
+			});
+		}
+		</script>
+		
+	</body>
 </html>
+

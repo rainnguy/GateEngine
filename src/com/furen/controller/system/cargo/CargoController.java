@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.furen.controller.base.BaseController;
+import com.furen.entity.Page;
 import com.furen.entity.system.Cargo;
 import com.furen.service.system.cargo.CargoService;
+import com.furen.service.system.role.RoleService;
 import com.furen.util.AppUtil;
+import com.furen.util.Jurisdiction;
 import com.furen.util.PageData;
 
 
@@ -29,8 +32,13 @@ import com.furen.util.PageData;
 @RequestMapping("/cargo/")
 public class CargoController extends BaseController {
 
+	String menuUrl = "role.do"; //菜单地址(权限用)
+
 	@Resource(name="cargoService")
 	private CargoService cargoService;
+	
+	@Resource(name="roleService")
+	private RoleService roleService;
 	
 	/**
 	 * 商品管理页面
@@ -39,14 +47,24 @@ public class CargoController extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping("cargoList")
-	public ModelAndView cargoList() throws Exception {
+	public ModelAndView cargoList(Page page) throws Exception {
 		
 		ModelAndView mv = this.getModelAndView();
-		
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String name = pd.getString("name");
+		pd.put("name", name);
+		page.setPd(pd);
+		List<PageData> roleList = roleService.listAllRoles(page);				//列出所有角色
+		//获得页面按钮
+		Jurisdiction.buttonJurisdictionForPage(menuUrl,pd);
 		mv.addObject("user", "admin");
+		mv.addObject("pd", pd);
+		mv.addObject("roleList", roleList);
 		mv.setViewName("/system/cargo/cargoList");
-		
+
 		return mv;
+		
 	}
 	
 	/**

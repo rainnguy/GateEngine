@@ -20,3 +20,7 @@
 	<script type="text/javascript" src="<%=basePath%>static/js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="<%=basePath%>static/js/ace-elements.min.js"></script>
 	<script type="text/javascript" src="<%=basePath%>static/js/ace.min.js"></script>
+	<!--提示框-->
+	<script type="text/javascript" src="<%=basePath%>static/js/jquery.tips.js"></script>
+		
+	
