@@ -54,12 +54,7 @@ $(function() {
 				document.getElementById("confirmAmount").value == "" || document.getElementById("confirmPayBank").value == "")))) {
 			document.getElementById("after").disabled = "disabled";
 			if(step == 3){
-				alert(document.getElementById("confirmStation").value);
-				alert(document.getElementById("confirmMoney").value);
-				alert(document.getElementById("confirmPrice").value);
-				alert(document.getElementById("confirmNumber").value);
-				alert(document.getElementById("confirmAmount").value);
-				alert(document.getElementById("confirmPayBank").value);
+				//
 			}
 		} else {
 			document.getElementById("after").disabled = "";
