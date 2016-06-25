@@ -108,8 +108,8 @@
 	<a href="#" id="btn-scroll-up" class="btn btn-small btn-inverse">
 		<i class="icon-double-angle-up icon-only"></i>
 	</a>
-	<script type="text/javascript"> -->
-		
+	<script type="text/javascript">
+	
 		//菜单权限
 		function toRoleInfo(id){
 			 top.jzts();
