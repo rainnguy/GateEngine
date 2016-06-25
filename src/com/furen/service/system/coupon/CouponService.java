@@ -1,8 +1,6 @@
 package com.furen.service.system.coupon;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -13,7 +11,7 @@ import com.furen.entity.Page;
 import com.furen.entity.system.Cargo;
 import com.furen.util.PageData;
 
-@Service("cargoService")
+@Service("couponService")
 public class CouponService {
 
 	@Resource(name = "daoSupport")
