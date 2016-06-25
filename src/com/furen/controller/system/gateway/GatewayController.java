@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,6 +20,7 @@ import com.csii.payment.client.core.MerchantSignVerifyExt;
 import com.furen.controller.base.BaseController;
 import com.furen.entity.system.Department;
 import com.furen.entity.system.Gateway;
+import com.furen.entity.system.Order;
 import com.furen.service.system.department.DepartmentService;
 import com.furen.service.system.gateway.GatewayService;
 import com.furen.service.system.order.OrderService;
@@ -97,6 +100,9 @@ public class GatewayController extends BaseController {
 					if(count != 1){
 						// TODO 更新订单失败的处理
 					}
+					
+					// 生成加油券
+					createCardTicket(map.get("termSsn"));
 				} else {
 					
 					Map<String, String> codeMap = new HashMap<String, String>();
@@ -271,4 +277,101 @@ public class GatewayController extends BaseController {
 		mv.addObject("orgValue", orgCodeMap);
 	}
 	
+	/**
+	 * 生成加油券
+	 * 
+	 * @param termSsn 订单号
+	 */
+	private void createCardTicket(String termSsn){
+		
+		// 生成交易码 默认8位
+		String payCode = getRandomString(8);
+		
+		/*	
+		// 获取订单信息
+		Order order = orderService.getOrderInfo(termSsn);
+		if (order != null){
+			
+			// 获取购买数量
+			int number = order.getNumber();
+			
+			Map<String,String> mapForCeateCard = new HashMap<String,String>();
+			
+			// 订单时间
+			mapForCeateCard.put("orderTime", order.getOrderTime());
+			// 购买的用户
+			mapForCeateCard.put("userCode", order.getUserCode());
+			// 商户号
+			mapForCeateCard.put("merchantNum", order.getMerchantNum());
+			// 商户名称
+			mapForCeateCard.put("merchantName", order.getMerchantName());
+			// 商品名称
+			mapForCeateCard.put("goodsName", order.getGoodsName());
+			// 商品面值
+			mapForCeateCard.put("goodsValue", String.valueOf(order.getGoodsValue()));
+		}
+		
+		// 获取表中当天的最大卡号
+		String maxCode = dispCardMapper.findMaxCardId(dispCardMap);
+		
+		
+		// 当天开始时间
+		dispCardMap.put("startTime", DateUtil.getStartTime());
+		Integer tempCode = 0;
+		if(maxCode != null && maxCode != ""){
+			tempCode = Integer.valueOf(maxCode.substring(12));
+		}
+		Integer num = Integer.valueOf(number.toString());
+		List<DispCardMap> dispCardMapList = new ArrayList<DispCardMap>();
+		String zero = "00000000";
+		for(int i = 1; i <= num ; i++){
+			String str = String.valueOf(tempCode + i);
+			String newCode = "LPK0" + nowDay + zero.substring(str.length()) + str;
+			
+			// 卡号
+			dispCardMap.put("code", newCode);
+			// 密码
+			dispCardMap.put("password", encoderByMd5(newCode));
+			// 站点编号
+			dispCardMap.put(SysConsts.ORG_CODE, Common.findAttrValue(SysConsts.ORG_CODE));
+			// 操作编号
+			dispCardMap.put(SysConsts.OPER_CODE, Common.findAttrValue(SysConsts.OPER_CODE));
+			// 当前系统时间
+			dispCardMap.put("nowDate", DateUtil.getCurrDate());
+			
+			dispCardMapList.add(dispCardMap);
+			
+			dispCardMap = getFormMap(DispCardMap.class);
+		}
+		
+		try {
+			int count = DispCardMap.mapper().insertNewData(dispCardMapList);
+			if(count != dispCardMapList.size()){
+				return "insertwrong";
+			}
+		} catch (Exception e) {
+			throw new SystemException("生成卡异常");
+		}
+		*/
+	}
+	
+	/**
+	 * 生成随机字符串，包括大写字母和数字
+	 * 
+	 * @param length
+	 * @return
+	 */
+	private String getRandomString(int length) {
+        String str="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuffer sb = new StringBuffer();
+        
+        for(int i = 0 ; i < length; ++i){
+        	
+        	int number = random.nextInt(46);//[0,36)
+        	sb.append(str.charAt(number));
+        }
+        
+        return sb.toString();
+    }
 }

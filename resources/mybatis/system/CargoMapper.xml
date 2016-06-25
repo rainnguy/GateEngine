@@ -4,11 +4,14 @@
 <mapper namespace="CargoMapper">
 
 	<resultMap type="Cargo" id="cargoResultMap">
+		<result property="id" column="id"/>
 		<result property="merchantCode" column="merchant_code"/>
+		<result property="merchantName" column="merchant_name"/>
 		<result property="goodsName" column="goods_Name"/>
 		<result property="goodsValue" column="goods_value"/>
 		<result property="price" column="price"/>
 		<result property="discount" column="discount"/>
+		<result property="remark" column="remark"/>
 	</resultMap>
 
 	<!-- 获取请求交易时的交易缩写 -->
@@ -27,4 +30,32 @@
 		order by goods_value asc
 	</select>
 	
+	<!-- 获取各站点的商品 -->
+	<select id="getCargoList" parameterType="pd" resultMap="cargoResultMap">
+		select
+			id,
+			merchant_code,
+			merchant_name,
+			goods_Name,
+			goods_value,
+			price,
+			discount,
+			remark
+		from
+			cargo
+		where
+			del_flag = '1'
+			<if test="pd.name != null and pd.name != ''">
+				and merchant_name LIKE CONCAT(CONCAT('%', #{pd.name}),'%')
+			</if>
+		order by
+			merchant_code, goods_value
+	</select>
+	
+	<!-- 把商品的删除标志改为“已删除” -->
+	<update id="deleteCargo" parameterType="pd">
+		update cargo 
+		set del_flag = '2'
+		where id = #{id}
+	</update>
 </mapper>

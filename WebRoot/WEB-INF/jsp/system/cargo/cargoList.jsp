@@ -6,14 +6,14 @@
 <html lang="en">
 	<head>
 		<%@include file="/common/common.jsp"%>
-		<script type="text/javascript" src="<%=basePath%>static/js/cargo/cargoList.js"></script>
+<%-- 		<script type="text/javascript" src="<%=basePath%>static/js/cargo/cargoList.js"></script> --%>
 	</head>
 <body>
 	<div class="container-fluid" id="main-container">
 		<div id="page-content" class="clearfix">
   			<div class="row-fluid">
 				<div class="row-fluid">
-					<form action="role.do" method="post" name="roleForm" id="roleForm">
+					<form action="cargo.do" method="post" name="cargoForm" id="cargoForm">
 						<!-- 检索  -->
 						<table>
 							<tr>
@@ -30,12 +30,13 @@
 						<table id="table_report" class="table table-striped table-bordered table-hover">
 							<thead>
 								<tr>
-									<th class="center">
-										<label><input type="checkbox" id="zcheckbox" /><span class="lbl"></span></label>
-									</th>
 									<th>序号</th>
-									<th>名称</th>
-									<th>角色级别</th>
+									<th>商户号</th>
+									<th>商户名</th>
+									<th>商品名称</th>
+									<th>商品面值</th>
+									<th>商品价格</th>
+									<th>折扣</th>
 									<th>备注</th>
 									<th class="center">操作</th>
 								</tr>
@@ -43,32 +44,40 @@
 							<tbody>
 								<!-- 开始循环 -->	
 								<c:choose>
-									<c:when test="${not empty roleList}">
-										<c:forEach items="${roleList}" var="role" varStatus="vs">
+									<c:when test="${not empty cargoList}">
+										<c:forEach items="${cargoList}" var="cargo" varStatus="vs">
 											<tr>
-												<td class='center' style="width: 30px;">
-													<c:if test="${role.id != 1}"><label><input type='checkbox' name='ids' value="${role.id }" id="${role.id }" alt="${role.name }"/><span class="lbl"></span></label></c:if>
+												<td style="display:none">
+													<input type='hidden' id="id" value="${cargo.id}" />
 												</td>
-												<td class='center' style="width: 30px;">${vs.index+1}</td>
-												<td>${role.name }</td>
+												<td class='center'>${vs.index+1}</td>
+												<td>${cargo.merchantCode}</td>
 												<td>
-													${role.levelName }
+													${cargo.merchantName}
 												</td>
 												<td>
-													${role.remark }
+													${cargo.goodsName}
+												</td>
+												<td>
+													${cargo.goodsValue}
+												</td>
+												<td>
+													${cargo.price}
+												</td>
+												<td>
+													${cargo.discount}
+												</td>
+												<td>
+													${cargo.remark}
 												</td>
 												<td style="width: 60px;">
 													<div class='hidden-phone visible-desktop btn-group'>
-<%-- 														<c:if test="${pd.showEdit }"> --%>
-															<a class='btn btn-mini btn-info' title="编辑" onclick="toRoleInfo('${role.id }');">
-																<i class='icon-edit'></i>
-															</a>
-<%-- 														</c:if> --%>
-<%-- 														<c:if test="${role.id != 1 && pd.showDelete}"> --%>
-															<a class='btn btn-mini btn-danger' title="删除" onclick="deleteRole('${role.id }','${role.name }');">
-														 		<i class='icon-trash'></i>
-														 	</a>
-<%-- 														</c:if> --%>
+														<a class='btn btn-mini btn-info' title="编辑" onclick="toRoleInfo('${cargo.id}');">
+															<i class='icon-edit'></i>
+														</a>
+														<a class='btn btn-mini btn-danger' title="删除" onclick="deleteCargo('${cargo.id}','${cargo.goodsName}','${cargo.goodsValue}');">
+													 		<i class='icon-trash'></i>
+													 	</a>
 													</div>
 												</td>
 											</tr>
@@ -86,9 +95,7 @@
 							<table style="width:100%;">
 								<tr>
 									<td style="vertical-align:top;">
-<%-- 										<c:if test="${pd.showAdd}"> --%>
-											<a class="btn btn-small btn-success" onclick="toRoleInfo('');">新增</a>
-<%-- 										</c:if> --%>
+										<a class="btn btn-small btn-success" onclick="toRoleInfo('');">新增</a>
 									</td>
 									<td style="vertical-align:top;">
 										<div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">
@@ -108,7 +115,16 @@
 	<a href="#" id="btn-scroll-up" class="btn btn-small btn-inverse">
 		<i class="icon-double-angle-up icon-only"></i>
 	</a>
+	
 	<script type="text/javascript">
+	
+		$(top.hangge());
+		
+		//检索
+		function search(){
+			top.jzts();
+			$("#cargoForm").submit();
+		}
 	
 		//菜单权限
 		function toRoleInfo(id){
@@ -116,11 +132,11 @@
 			 var diag = new top.Dialog();
 			 diag.Drag = true;
 			 if(id == '') {
-				 diag.Title = "新增角色";
+				 diag.Title = "新增商品";
 			 } else {
-				 diag.Title = "编辑角色";
+				 diag.Title = "编辑商品";
 			 }
-			 diag.URL = '<%=basePath%>role/toRoleInfo.do?id='+id;
+			 diag.URL = '<%=basePath%>cargo/toRoleInfo.do?id='+id;
 			 diag.Width = 380;
 			 diag.Height = 420;
 			 diag.CancelEvent = function(){ //关闭事件
@@ -137,88 +153,19 @@
 			 diag.show();
 		}
 		
-		//批量操作
-		function makeAll(msg){
-			bootbox.confirm(msg, function(result) {
-				if(result) {
-					var str = '';
-					var emstr = '';
-					var phones = '';
-					for(var i=0;i < document.getElementsByName('ids').length;i++)
-					{
-						  if(document.getElementsByName('ids')[i].checked){
-						  	if(str=='') str += document.getElementsByName('ids')[i].value;
-						  	else str += ',' + document.getElementsByName('ids')[i].value;
-						  	
-						  	if(emstr=='') emstr += document.getElementsByName('ids')[i].id;
-						  	else emstr += ';' + document.getElementsByName('ids')[i].id;
-						  	
-						  	if(phones=='') phones += document.getElementsByName('ids')[i].alt;
-						  	else phones += ';' + document.getElementsByName('ids')[i].alt;
-						  }
-					}
-					if(str==''){
-						bootbox.dialog("您没有选择任何内容!", 
-							[
-							  {
-								"label" : "关闭",
-								"class" : "btn-small btn-success",
-								"callback": function() {
-									//Example.show("great success");
-									}
-								}
-							 ]
-						);
-						
-						$("#zcheckbox").tips({
-							side:3,
-				            msg:'点这里全选',
-				            bg:'#AE81FF',
-				            time:8
-				        });
-						
-						return;
-					}else{
-						if(msg == '确定要删除选中的数据吗?'){
-							top.jzts();
-							$.ajax({
-								type: "POST",
-								url: '<%=basePath%>user/deleteAllU.do?tm='+new Date().getTime(),
-						    	data: {USER_IDS:str},
-								dataType:'json',
-								//beforeSend: validateData,
-								cache: false,
-								success: function(data){
-									 $.each(data.list, function(i, list){
-											nextPage(${page.currentPage});
-									 });
-								}
-							});
-						}else if(msg == '确定要给选中的用户发送邮件吗?'){
-							sendEmail(emstr);
-						}else if(msg == '确定要给选中的用户发送短信吗?'){
-							sendSms(phones);
-						}
-						
-						
-					}
-				}
-			});
-		}
-		
-		function deleteRole(id,name) {
-			bootbox.confirm("确定要删除角色：["+name+"]吗?", function(result) {
+		function deleteCargo(id,goodsName,goodsValue) {
+			bootbox.confirm("确定要删除该商品吗?", function(result) {
 				if(result) {
 					top.jzts();
-					var url = "<%=basePath%>role/delete.do?id="+id+"&name="+name+"&tm="+new Date().getTime();
+					var url = "<%=basePath%>cargo/deleteCargo.do?id="+id+"&goodsName="+goodsName+"&goodsValue="+goodsValue;
 					$.get(url,function(data){
+						alert("!!!!!!!!!!");
 						nextPage(${page.currentPage});
 					});
 				}
 			});
 		}
-		</script>
+	</script>
 		
 	</body>
 </html>
-

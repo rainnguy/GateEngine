@@ -4,6 +4,28 @@
 <mapper namespace="OrderMapper">
 
 	<resultMap type="Order" id="orderResultMap">
+		<result property="orderCode" column="order_code"/>
+		<result property="orderTime" column="order_time"/>
+		<result property="orderStatus" column="order_status"/>
+		<result property="tranAbbr" column="tran_abbr"/>
+		<result property="userCode" column="user_code"/>
+		<result property="merchantNum" column="merchant_num"/>
+		<result property="merchantName" column="merchant_name"/>
+		<result property="goodsName" column="goods_name"/>
+		<result property="goodsValue" column="goods_value"/>
+		<result property="price" column="price"/>
+		<result property="number" column="number"/>
+		<result property="amount" column="amount"/>
+		<result property="pay_type" column="pay_type"/>
+		<result property="pay_type_content" column="pay_type_content"/>
+		<result property="pay_bank" column="pay_bank"/>
+		<result property="pay_bank_name" column="pay_bank_name"/>
+		<result property="card_type" column="card_type"/>
+		<result property="card_type_content" column="card_type_content"/>
+		<result property="acqSsn" column="acq_ssn"/>
+		<result property="respCode" column="resp_code"/>
+		<result property="termCode" column="term_code"/>
+		<result property="clearDate" column="clear_date"/>
 	</resultMap>
 
 	<!-- 插入订单数据 -->
@@ -65,9 +87,28 @@
 			resp_code = #{respCode},
 			term_code = #{termCode},
 			clear_date = #{clearDate}
-		where 
+		where
 			order_code = #{termSsn}
 			and del_flag = '1'
 	</update>
-
+	
+	<!-- 获取订单信息 -->
+	<select id="getOrderInfo" parameterType="String" resultMap="orderResultMap">
+		select
+			order_code,
+			order_time,
+			user_code,
+			merchant_num,
+			merchant_name,
+			goods_name,
+			goods_value,
+			price,
+			number
+		from
+			orders
+		where
+			order_code = #{termSsn}
+			and order_status = '2'
+			and del_flag = '1'
+	</select>
 </mapper>

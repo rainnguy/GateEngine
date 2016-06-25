@@ -13,7 +13,7 @@
 	//检索
 	function search(){
 		top.jzts();
-		$("#roleForm").submit();
+		$("#cargoForm").submit();
 	}
 	
 	

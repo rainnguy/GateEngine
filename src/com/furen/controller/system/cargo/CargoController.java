@@ -1,5 +1,6 @@
 package com.furen.controller.system.cargo;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,9 @@ import com.furen.controller.base.BaseController;
 import com.furen.entity.Page;
 import com.furen.entity.system.Cargo;
 import com.furen.service.system.cargo.CargoService;
-import com.furen.service.system.role.RoleService;
+import com.furen.service.system.log.LogService;
 import com.furen.util.AppUtil;
+import com.furen.util.Const;
 import com.furen.util.Jurisdiction;
 import com.furen.util.PageData;
 
@@ -29,16 +31,15 @@ import com.furen.util.PageData;
  * @version 1.0v
  */
 @Controller
-@RequestMapping("/cargo/")
+@RequestMapping("/cargo")
 public class CargoController extends BaseController {
 
-	String menuUrl = "role.do"; //菜单地址(权限用)
+	String menuUrl = "cargo/cargoList.do"; //菜单地址(权限用)
 
 	@Resource(name="cargoService")
 	private CargoService cargoService;
-	
-	@Resource(name="roleService")
-	private RoleService roleService;
+	@Resource(name="logService")
+	private LogService logService;
 	
 	/**
 	 * 商品管理页面
@@ -46,7 +47,7 @@ public class CargoController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("cargoList")
+	@RequestMapping
 	public ModelAndView cargoList(Page page) throws Exception {
 		
 		ModelAndView mv = this.getModelAndView();
@@ -55,16 +56,15 @@ public class CargoController extends BaseController {
 		String name = pd.getString("name");
 		pd.put("name", name);
 		page.setPd(pd);
-		List<PageData> roleList = roleService.listAllRoles(page);				//列出所有角色
+		List<PageData> cargoList = cargoService.getCargoList(page);				//列出所有角色
 		//获得页面按钮
 		Jurisdiction.buttonJurisdictionForPage(menuUrl,pd);
 		mv.addObject("user", "admin");
 		mv.addObject("pd", pd);
-		mv.addObject("roleList", roleList);
+		mv.addObject("cargoList", cargoList);
 		mv.setViewName("/system/cargo/cargoList");
 
 		return mv;
-		
 	}
 	
 	/**
@@ -104,5 +104,27 @@ public class CargoController extends BaseController {
 		map.put("goodsValue", goodsValue);
 		
 		return AppUtil.returnObject(new PageData(), map);
+	}
+	
+	/**
+	 * 删除
+	 */
+	@RequestMapping(value="deleteCargo")
+	public void deleteCargo(PrintWriter out) {
+		
+		PageData pd = new PageData();
+		try{
+			pd = this.getPageData();
+			cargoService.deleteCargo(pd);
+			out.write("success");
+			out.close();
+		} catch(Exception e){
+			logger.error(e.toString(), e);
+		}
+		//插入日志
+//		logService.insertOneLog(menuUrl,
+//			Const.LOG_SYSTEM_TYPE_DATA,
+//			Const.LOG_OPERATOR_TYPE_DELETE,
+//			"删除商品："+pd.get("goodsName").toString()+pd.get("goodsValue").toString());
 	}
 }

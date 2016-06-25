@@ -2,8 +2,14 @@ package com.furen.entity.system;
 
 public class Cargo {
 
+	/** id */
+	private String id = null;
+	
 	/** 商户号 */
 	private String merchantCode = null;
+	
+	/** 商户名 */
+	private String merchantName = null;
 
 	/** 商品名 */
 	private String goodsName = null;
@@ -16,7 +22,24 @@ public class Cargo {
 
 	/** 折扣 */
 	private String discount = null;
+	
+	/** 备注 */
+	private String remark = null;
 
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	/**
 	 * 商户号
 	 * @return the merchantCode
@@ -31,6 +54,22 @@ public class Cargo {
 	 */
 	public void setMerchantCode(String merchantCode) {
 		this.merchantCode = merchantCode;
+	}
+
+	/**
+	 * 商户名
+	 * @return the merchantName
+	 */
+	public String getMerchantName() {
+		return merchantName;
+	}
+
+	/**
+	 * 商户名
+	 * @param merchantName the merchantName to set
+	 */
+	public void setMerchantName(String merchantName) {
+		this.merchantName = merchantName;
 	}
 
 	/**
@@ -96,4 +135,21 @@ public class Cargo {
 	public void setDiscount(String discount) {
 		this.discount = discount;
 	}
+
+	/**
+	 * 备注
+	 * @return the remark
+	 */
+	public String getRemark() {
+		return remark;
+	}
+
+	/**
+	 * 备注
+	 * @param remark the remark to set
+	 */
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	
 }
