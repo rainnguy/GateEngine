@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CouponMapper">
+
+	<resultMap type="Coupon" id="couponResultMap">
+		<result property="code" column="code"/>
+		<result property="name" column="name"/>
+		<result property="payCode" column="pay_code"/>
+		<result property="cardValue" column="card_value"/>
+		<result property="price" column="price"/>
+		<result property="owner" column="owner"/>
+		<result property="buyTime" column="buy_time"/>
+		<result property="useStatus" column="use_status"/>
+		<result property="useTime" column="use_time"/>
+		<result property="buyStation" column="buy_station"/>
+		<result property="remark" column="remark"/>
+	</resultMap>
+
+	<!-- 获取请求交易时的交易缩写 -->
+	<select id="findMaxCode" parameterType="String" resultMap="couponResultMap">
+		select
+			max(code) as code
+		from
+			coupon
+		where
+			left(code,14) = #{orderTime}
+			and del_flag = '1'
+	</select>
+	
+	<!-- 判断支付码是否冲突 -->
+	<select id="isPayCodeExisted" parameterType="map" resultMap="couponResultMap">
+		select
+			pay_code
+		from
+			coupon
+		where
+			pay_code = #{payCode}
+			and
+			(del_flag = '1'
+			or
+			(del_flag = '2'
+			and #{orderTime} &lt;= DATE_FORMAT(DATE_ADD(use_time,INTERVAL 3 MONTH),'%Y%m%d%H%i%s')
+			))
+	</select>
+	
+	<!-- 插入卡券数据 -->
+	<insert id="insertCoupons" parameterType="java.util.List">
+		INSERT INTO coupon
+		(code,
+		name,
+		pay_code,
+		card_value,
+		price,
+		owner,
+		buy_time,
+		buy_station
+		)
+		VALUES
+		<foreach collection="list" item="map" open="" separator="," close="">  
+			(#{map.newCode},
+			#{map.goodsName},
+			#{map.payCode},
+			#{map.goodsValue},
+			#{map.price},
+			#{map.userCode},
+			#{map.orderTime},
+			#{map.merchantNum}
+			)
+		</foreach>  
+	</insert>
+</mapper>

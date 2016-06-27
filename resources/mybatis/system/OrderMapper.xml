@@ -51,7 +51,7 @@
 			card_type_content
 		) values (
 			#{termSsn},
-			DATE_FORMAT(sysdate(),'%Y-%m-%d %H:%i:%s'),
+			DATE_FORMAT(sysdate(),'%Y%m%d%H%i%s'),
 			'1',
 			#{transName},
 			#{userCode},

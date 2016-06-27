@@ -84,6 +84,7 @@
 											<select class="span2" id="money" name="money" onchange="showValue()">
 											</select>
 											<span class="help-inline" id="moneyHelp" style="color: #FF0000"></span>
+											<input type="hidden" id="moneyHidden" value=""/>
 										</span>
 									</div>
 								</div>

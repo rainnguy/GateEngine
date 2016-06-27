@@ -27,6 +27,8 @@
 		<typeAlias type="com.furen.entity.system.Cargo" alias="Cargo"/>
 		<!-- 订单 -->
 		<typeAlias type="com.furen.entity.system.Order" alias="Order"/>
+		<!-- 卡券 -->
+		<typeAlias type="com.furen.entity.system.Coupon" alias="Coupon"/>
 		<!-- 数据字典 -->
 		<typeAlias type="com.furen.entity.system.Dictionary" alias="Dictionary"/>
 		<!-- 日志 -->

@@ -69,8 +69,9 @@ $(function() {
 				cache : false,
 				success : function(data) {
 					
-					// 清空下拉列表
+					// 清空面值
 					document.getElementById("money").length = 0;
+					document.getElementById("moneyHidden").value = "";
 					// 清空价格
 					document.getElementById("realPrice").value = "";
 					// “下一步”不可点击
@@ -331,12 +332,14 @@ function showValue() {
 				document.getElementById("confirmMoney").value = "";
 				document.getElementById("confirmPrice").value = "";
 				document.getElementById("realPrice").value = "";
+				document.getElementById("moneyHidden").value = "";
 				document.getElementById("moneyHelp").innerText = "请选择要购买的面值！";
 				document.getElementById("after").disabled = "disabled";
 			} else {
 				document.getElementById("confirmMoney").value = moneyTemp + " 元";
 				document.getElementById("confirmPrice").value = price + " 元";
 				document.getElementById("realPrice").value = price;
+				document.getElementById("moneyHidden").value = moneyTemp;
 				document.getElementById("moneyHelp").innerText = "";
 				if (document.getElementById("numberHelp").innerText == "") {
 					document.getElementById("after").disabled = "";
@@ -392,6 +395,7 @@ function showUseAbleStations() {
 			}
 			
 			document.getElementById("money").length = 0; // 清空下拉列表
+			document.getElementById("moneyHidden").value = "";
 			document.getElementById("realPrice").value = "";
 			document.getElementById("bank").value = "";
 			document.getElementById("bankValue").value = "";
@@ -491,7 +495,7 @@ function saveOrder() {
 			merchantNum : document.getElementById("merchantNum").value,
 			merchantName : document.getElementById("confirmStation").value,
 			goodsName : document.getElementById("confirmDescription").value,
-			goodsValue : document.getElementById("money").value,
+			goodsValue : document.getElementById("moneyHidden").value,
 			price : document.getElementById("realPrice").value,
 			number : document.getElementById("confirmNumber").value,
 			amount : document.getElementById("realPrice").value

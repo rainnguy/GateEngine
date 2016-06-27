@@ -9,7 +9,6 @@ import java.util.Random;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,9 +17,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.csii.payment.client.core.MerchantSignVerify;
 import com.csii.payment.client.core.MerchantSignVerifyExt;
 import com.furen.controller.base.BaseController;
+import com.furen.entity.system.Coupon;
 import com.furen.entity.system.Department;
 import com.furen.entity.system.Gateway;
 import com.furen.entity.system.Order;
+import com.furen.service.system.coupon.CouponService;
 import com.furen.service.system.department.DepartmentService;
 import com.furen.service.system.gateway.GatewayService;
 import com.furen.service.system.order.OrderService;
@@ -45,6 +46,9 @@ public class GatewayController extends BaseController {
 	
 	@Resource(name="orderService")
 	private OrderService orderService;
+	
+	@Resource(name="couponService")
+	private CouponService couponService;
 	
 	/**
 	 * 购买页面
@@ -102,7 +106,10 @@ public class GatewayController extends BaseController {
 					}
 					
 					// 生成加油券
-					createCardTicket(map.get("termSsn"));
+					String result = createCardTicket(map.get("termSsn"));
+					if (!"success".equals(result)) {
+						// TODO 异常处理
+					}
 				} else {
 					
 					Map<String, String> codeMap = new HashMap<String, String>();
@@ -281,87 +288,112 @@ public class GatewayController extends BaseController {
 	 * 生成加油券
 	 * 
 	 * @param termSsn 订单号
+	 * @throws Exception 
+	 * @return 
 	 */
-	private void createCardTicket(String termSsn){
+	private String createCardTicket(String termSsn) throws Exception{
 		
-		// 生成交易码 默认8位
-		String payCode = getRandomString(8);
-		
-		/*	
 		// 获取订单信息
 		Order order = orderService.getOrderInfo(termSsn);
-		if (order != null){
-			
-			// 获取购买数量
-			int number = order.getNumber();
-			
-			Map<String,String> mapForCeateCard = new HashMap<String,String>();
-			
-			// 订单时间
-			mapForCeateCard.put("orderTime", order.getOrderTime());
-			// 购买的用户
-			mapForCeateCard.put("userCode", order.getUserCode());
-			// 商户号
-			mapForCeateCard.put("merchantNum", order.getMerchantNum());
-			// 商户名称
-			mapForCeateCard.put("merchantName", order.getMerchantName());
-			// 商品名称
-			mapForCeateCard.put("goodsName", order.getGoodsName());
-			// 商品面值
-			mapForCeateCard.put("goodsValue", String.valueOf(order.getGoodsValue()));
+		
+		if (order == null) {
+			// TODO 异常处理
+			return "error";
 		}
+		
+		// 购买数量
+		int number = order.getNumber();
+		// 订单时间
+		String orderTime = order.getOrderTime();
+		
+		List<Map<String,String>> mapList = new ArrayList<Map<String,String>>();
+		Map<String,String> map = new HashMap<String,String>();
 		
 		// 获取表中当天的最大卡号
-		String maxCode = dispCardMapper.findMaxCardId(dispCardMap);
-		
-		
-		// 当天开始时间
-		dispCardMap.put("startTime", DateUtil.getStartTime());
-		Integer tempCode = 0;
-		if(maxCode != null && maxCode != ""){
-			tempCode = Integer.valueOf(maxCode.substring(12));
-		}
-		Integer num = Integer.valueOf(number.toString());
-		List<DispCardMap> dispCardMapList = new ArrayList<DispCardMap>();
-		String zero = "00000000";
-		for(int i = 1; i <= num ; i++){
-			String str = String.valueOf(tempCode + i);
-			String newCode = "LPK0" + nowDay + zero.substring(str.length()) + str;
-			
-			// 卡号
-			dispCardMap.put("code", newCode);
-			// 密码
-			dispCardMap.put("password", encoderByMd5(newCode));
-			// 站点编号
-			dispCardMap.put(SysConsts.ORG_CODE, Common.findAttrValue(SysConsts.ORG_CODE));
-			// 操作编号
-			dispCardMap.put(SysConsts.OPER_CODE, Common.findAttrValue(SysConsts.OPER_CODE));
-			// 当前系统时间
-			dispCardMap.put("nowDate", DateUtil.getCurrDate());
-			
-			dispCardMapList.add(dispCardMap);
-			
-			dispCardMap = getFormMap(DispCardMap.class);
+		Coupon coupon = couponService.findMaxCode(orderTime);
+		String maxCode = "";
+		if (coupon != null) {
+			maxCode = coupon.getCode(); 
 		}
 		
-		try {
-			int count = DispCardMap.mapper().insertNewData(dispCardMapList);
-			if(count != dispCardMapList.size()){
-				return "insertwrong";
+		for(int i = 1; i <= number ; i++){
+			
+			// 新的卡券号
+			String newCode = null;
+			String zero = "0000";
+			if ("".equals(maxCode)) {
+				String str = String.valueOf(i);
+				if (i < 1000) {
+					newCode = orderTime + zero.substring(str.length()) + str;
+				} else {
+					newCode = orderTime + str;
+				}
+			} else {
+				int numTemp = Integer.valueOf(maxCode.substring(14)) + i;
+				String numStr = String.valueOf(numTemp);
+				if (numTemp < 1000) {
+					newCode = maxCode.substring(0,14) + zero.substring(numStr.length()) + numStr;
+				} else {
+					newCode = maxCode.substring(0,14) + numStr;
+				}
 			}
-		} catch (Exception e) {
-			throw new SystemException("生成卡异常");
+			
+			// 支付码
+			String payCode = null;
+			while (true) {
+				Map<String,String> mapTemp = new HashMap<String,String>();
+				payCode = getRandomString();
+				mapTemp.put("payCode", payCode);
+				mapTemp.put("orderTime", orderTime);
+				// 判断该支付码是否冲突
+				Coupon couponTemp = couponService.isPayCodeExisted(mapTemp);
+				if (couponTemp != null && couponTemp.getPayCode() != null && !"".equals(couponTemp.getPayCode())) {
+					continue;
+				} else {
+					break;
+				}
+			}
+			map.put("payCode", payCode);
+			
+			// 卡券号
+			map.put("newCode", newCode);
+			// 订单时间
+			map.put("orderTime", orderTime);
+			// 购买的用户
+			map.put("userCode", order.getUserCode());
+			// 商户号
+			map.put("merchantNum", order.getMerchantNum());
+			// 商户名称
+			map.put("merchantName", order.getMerchantName());
+			// 商品名称
+			map.put("goodsName", order.getGoodsName());
+			// 商品面值
+			map.put("goodsValue", String.valueOf(order.getGoodsValue()));
+			// 商品价格
+			map.put("price", String.valueOf(order.getPrice()));
+			
+			mapList.add(map);
+			map = new HashMap<String,String>();
 		}
-		*/
+		
+		// 插入卡券数据
+		int count = couponService.insertCoupons(mapList);
+		if(count != mapList.size()){
+			return "insertwrong";
+		} else {
+			return "success";
+		}
 	}
 	
 	/**
 	 * 生成随机字符串，包括大写字母和数字
 	 * 
-	 * @param length
 	 * @return
 	 */
-	private String getRandomString(int length) {
+	private String getRandomString() {
+		//定义支付码长度
+		int length = 8;
+		//定义支付码每一位的范围
         String str="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
