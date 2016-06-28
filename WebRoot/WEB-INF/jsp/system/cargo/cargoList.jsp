@@ -95,9 +95,6 @@
 							<table style="width:100%;">
 								<tr>
 									<td style="vertical-align:top;">
-										<a class="btn btn-small btn-success" onclick="toRoleInfo('');">新增</a>
-									</td>
-									<td style="vertical-align:top;">
 										<div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">
 											${page.pageStr}
 										</div>
@@ -159,7 +156,6 @@
 					top.jzts();
 					var url = "<%=basePath%>cargo/deleteCargo.do?id="+id+"&goodsName="+goodsName+"&goodsValue="+goodsValue;
 					$.get(url,function(data){
-						alert("!!!!!!!!!!");
 						nextPage(${page.currentPage});
 					});
 				}

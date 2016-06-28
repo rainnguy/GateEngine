@@ -49,6 +49,7 @@
 		<plugin interceptor="com.furen.plugin.PagePlugin1">
 			<property name="dialect" value="oracle"/>
 			<property name="pageSqlId" value=".*listPage.*"/>
+			<property name="pageSqlId" value=".*ListPage.*"/>
 		</plugin>
 	</plugins>
 	

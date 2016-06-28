@@ -36,7 +36,7 @@ public class CargoService {
 	 * @throws Exception
 	 */
 	public List<PageData> getCargoList(Page pd) throws Exception {
-		return (List<PageData>) dao.findForList("CargoMapper.getCargoList", pd);
+		return (List<PageData>) dao.findForList("CargoMapper.getCargoListPage", pd);
 	}
 	
 	/**

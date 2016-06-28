@@ -19,7 +19,6 @@ import com.furen.entity.system.Cargo;
 import com.furen.service.system.cargo.CargoService;
 import com.furen.service.system.log.LogService;
 import com.furen.util.AppUtil;
-import com.furen.util.Const;
 import com.furen.util.Jurisdiction;
 import com.furen.util.PageData;
 
@@ -38,6 +37,7 @@ public class CargoController extends BaseController {
 
 	@Resource(name="cargoService")
 	private CargoService cargoService;
+	
 	@Resource(name="logService")
 	private LogService logService;
 	

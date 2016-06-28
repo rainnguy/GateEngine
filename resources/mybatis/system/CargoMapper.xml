@@ -31,7 +31,7 @@
 	</select>
 	
 	<!-- 获取各站点的商品 -->
-	<select id="getCargoList" parameterType="pd" resultMap="cargoResultMap">
+	<select id="getCargoListPage" parameterType="pd" resultMap="cargoResultMap">
 		select
 			id,
 			merchant_code,
