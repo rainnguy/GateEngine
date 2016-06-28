@@ -116,7 +116,7 @@
 	</select>
 	
 	<!-- 获取用户的所有订单 -->
-	<select id="getOrderList" parameterType="pd" resultMap="orderResultMap">
+	<select id="getOrderlistPage" parameterType="pd" resultMap="orderResultMap">
 		select
 			t1.order_code,
 			t1.order_time,
@@ -141,13 +141,31 @@
 			orders t1,
 			constant t2
 		where
-			t1.user_code = #{pd.userCode}
-			and t1.del_flag = '1'
+			t1.del_flag = '1'
 			and t2.kind = '11'
 			and t1.order_status = t2.constant_value
 			<if test="pd.code != null and pd.code != ''">
 				and t1.order_code = #{pd.code}
 			</if>
+			<choose>
+				<when test="pd.userRole != null and pd.userRole != '' and pd.userRole == 2">
+					and t1.merchant_num = (
+						select
+							merchant_num
+						from
+							sys_department
+						where
+							id = #{pd.demartId}
+							and is_delete = '1'
+					)
+				</when>
+				<when test="pd.userRole != null and pd.userRole != '' and pd.userRole == 3">
+					and t1.user_code = #{pd.userCode}
+				</when>
+				<when test="pd.userRole != null and pd.userRole != '' and pd.userRole == 8">
+					and t1.user_code = #{pd.userCode}
+				</when>
+			</choose>
 		order by t1.order_time desc
 	</select>
 </mapper>

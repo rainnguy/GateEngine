@@ -57,7 +57,7 @@ public class OrderService {
 	 * @throws Exception
 	 */
 	public List<PageData> getOrderList(Page pd) throws Exception {
-		return (List<PageData>) dao.findForList("OrderMapper.getOrderList", pd);
+		return (List<PageData>) dao.findForList("OrderMapper.getOrderlistPage", pd);
 	}
 	
 	/**

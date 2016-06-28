@@ -50,7 +50,10 @@ public class OrderController extends BaseController {
 		PageData pd = new PageData();
 		
 		pd = this.getPageData();
-		pd.put("userCode", getUserCode());
+		User user = getUserCode();
+		pd.put("userCode", user.getUSERNAME());
+		pd.put("userRole", user.getROLE_ID());
+		pd.put("demartId", user.getDepartmentId());
 		page.setPd(pd);
 		
 		// 获取用户的所有订单
@@ -78,7 +81,7 @@ public class OrderController extends BaseController {
 		Integer count = 0;
 		
 		pd = this.getPageData();
-		pd.put("userCode", getUserCode());
+		pd.put("userCode", getUserCode().getUSERNAME());
 		
 		try {
 			count = orderService.insertOrder(pd);
@@ -101,11 +104,10 @@ public class OrderController extends BaseController {
 	 * 获取登陆的用户名
 	 * @return
 	 */
-	private String getUserCode() {
+	private User getUserCode() {
 		
 		Subject subject = SecurityUtils.getSubject();  
 		Session session = subject .getSession();
-		User usera = (User)session.getAttribute(Const.SESSION_USER);
-		return usera.getUSERNAME();
+		return (User)session.getAttribute(Const.SESSION_USER);
 	}
 }
