@@ -4,9 +4,10 @@
 <mapper namespace="OrderMapper">
 
 	<resultMap type="Order" id="orderResultMap">
+		<result property="id" column="id"/>
 		<result property="orderCode" column="order_code"/>
 		<result property="orderTime" column="order_time"/>
-		<result property="orderStatus" column="order_status"/>
+		<result property="orderStatus" column="constant_name"/>
 		<result property="tranAbbr" column="tran_abbr"/>
 		<result property="userCode" column="user_code"/>
 		<result property="merchantNum" column="merchant_num"/>
@@ -16,16 +17,18 @@
 		<result property="price" column="price"/>
 		<result property="number" column="number"/>
 		<result property="amount" column="amount"/>
-		<result property="pay_type" column="pay_type"/>
-		<result property="pay_type_content" column="pay_type_content"/>
-		<result property="pay_bank" column="pay_bank"/>
-		<result property="pay_bank_name" column="pay_bank_name"/>
-		<result property="card_type" column="card_type"/>
-		<result property="card_type_content" column="card_type_content"/>
+		<result property="payType" column="pay_type"/>
+		<result property="payTypeContent" column="pay_type_content"/>
+		<result property="payBank" column="pay_bank"/>
+		<result property="payBankName" column="pay_bank_name"/>
+		<result property="cardType" column="card_type"/>
+		<result property="cardTypeContent" column="card_type_content"/>
 		<result property="acqSsn" column="acq_ssn"/>
 		<result property="respCode" column="resp_code"/>
 		<result property="termCode" column="term_code"/>
 		<result property="clearDate" column="clear_date"/>
+		<result property="remark" column="remark"/>
+		<result property="orderStatusName" column="constant_name"/>
 	</resultMap>
 
 	<!-- 插入订单数据 -->
@@ -110,5 +113,41 @@
 			order_code = #{termSsn}
 			and order_status = '2'
 			and del_flag = '1'
+	</select>
+	
+	<!-- 获取用户的所有订单 -->
+	<select id="getOrderList" parameterType="pd" resultMap="orderResultMap">
+		select
+			t1.order_code,
+			t1.order_time,
+			t1.order_status,
+			t2.constant_name,
+			t1.user_code,
+			t1.merchant_num,
+			t1.merchant_name,
+			t1.goods_name,
+			t1.goods_value,
+			t1.price,
+			t1.number,
+			t1.amount,
+			t1.pay_type,
+			t1.pay_type_content,
+			t1.pay_bank,
+			t1.pay_bank_name,
+			t1.card_type,
+			t1.card_type_content,
+			t1.remark
+		from
+			orders t1,
+			constant t2
+		where
+			t1.user_code = #{pd.userCode}
+			and t1.del_flag = '1'
+			and t2.kind = '11'
+			and t1.order_status = t2.constant_value
+			<if test="pd.code != null and pd.code != ''">
+				and t1.order_code = #{pd.code}
+			</if>
+		order by t1.order_time desc
 	</select>
 </mapper>

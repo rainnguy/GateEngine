@@ -1,5 +1,6 @@
 package com.furen.service.system.order;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -7,6 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.furen.dao.DaoSupport;
+import com.furen.entity.Page;
 import com.furen.entity.system.Order;
 import com.furen.util.PageData;
 
@@ -46,6 +48,16 @@ public class OrderService {
 	 */
 	public Integer updateOrderInfo(Map<String,String> map) throws Exception {
 		return (Integer) dao.update("OrderMapper.updateOrderInfo", map);
+	}
+	
+	/**
+	 * 获取用户的所有订单
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> getOrderList(Page pd) throws Exception {
+		return (List<PageData>) dao.findForList("OrderMapper.getOrderList", pd);
 	}
 	
 	/**

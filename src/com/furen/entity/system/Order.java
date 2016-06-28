@@ -1,7 +1,10 @@
 package com.furen.entity.system;
 
 public class Order {
-
+	
+	/** id */
+	private int id = 0;
+	
 	/** 订单号 */
 	private String orderCode =null;
 	
@@ -10,6 +13,9 @@ public class Order {
 	
 	/** 订单状态 */
 	private String orderStatus = null;
+	
+	/** 订单状态名称 */
+	private String orderStatusName = null;
 	
 	/** 交易缩写 */
 	private String tranAbbr = null;
@@ -67,6 +73,23 @@ public class Order {
 	
 	/** 清算日期 */
 	private String clearDate = null;
+	
+	/** 备注 */
+	private String remark = null;
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	/**
 	 * 订单号
@@ -114,6 +137,22 @@ public class Order {
 	 */
 	public void setOrderStatus(String orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	/**
+	 * 订单状态名称
+	 * @return the orderStatusName
+	 */
+	public String getOrderStatusName() {
+		return orderStatusName;
+	}
+
+	/**
+	 * 订单状态名称
+	 * @param orderStatusName the orderStatusName to set
+	 */
+	public void setOrderStatusName(String orderStatusName) {
+		this.orderStatusName = orderStatusName;
 	}
 
 	/**
@@ -418,5 +457,21 @@ public class Order {
 	 */
 	public void setClearDate(String clearDate) {
 		this.clearDate = clearDate;
+	}
+
+	/**
+	 * 备注
+	 * @return the remark
+	 */
+	public String getRemark() {
+		return remark;
+	}
+
+	/**
+	 * 备注
+	 * @param remark the remark to set
+	 */
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }
