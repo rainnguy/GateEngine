@@ -64,6 +64,7 @@ public class BaseController {
 		logger.info("");
 		logger.info("start");
 		logger.info(interfaceName);
+		//test
 	}
 	
 	public static void logAfter(Logger logger){
